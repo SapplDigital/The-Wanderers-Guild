@@ -146,6 +146,10 @@ combat_end_turn={
 "deadzone": 0.2,
 "events": [Object(InputEventKey,"physical_keycode":32), Object(InputEventJoypadButton,"button_index":6)]
 }
+dialogue_leave={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"physical_keycode":4194305), Object(InputEventJoypadButton,"button_index":1)]
+}
 debug_start_combat={
 "deadzone": 0.2,
 "events": [Object(InputEventKey,"physical_keycode":4194337)]

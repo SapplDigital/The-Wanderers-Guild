@@ -1,0 +1,208 @@
+[gd_resource type="Resource" script_class="DialogueData" format=3]
+
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_data.gd" id="data"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_node.gd" id="node"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_choice.gd" id="choice"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_condition.gd" id="cond"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_consequence.gd" id="cons"]
+
+[sub_resource type="Resource" id="cd1"]
+script = ExtResource("cond")
+flag = "npc.well_keeper.met"
+test = 1
+
+[sub_resource type="Resource" id="cs2"]
+script = ExtResource("cons")
+kind = 0
+key = "npc.well_keeper.met"
+
+[sub_resource type="Resource" id="ch3"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd1")])
+consequences = Array[ExtResource("cons")]([SubResource("cs2")])
+next = &"first"
+
+[sub_resource type="Resource" id="cd4"]
+script = ExtResource("cond")
+flag = "world.well_lamp_lit"
+test = 0
+
+[sub_resource type="Resource" id="ch5"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd4")])
+next = &"lamp_thanks"
+
+[sub_resource type="Resource" id="ch6"]
+script = ExtResource("choice")
+next = &"again"
+
+[sub_resource type="Resource" id="ch7"]
+script = ExtResource("choice")
+text = "Answering back?"
+next = &"reflection"
+
+[sub_resource type="Resource" id="cd8"]
+script = ExtResource("cond")
+flag = "world.well_lamp_lit"
+test = 1
+
+[sub_resource type="Resource" id="ch9"]
+script = ExtResource("choice")
+text = "The lamp on the post is dark."
+conditions = Array[ExtResource("cond")]([SubResource("cd8")])
+next = &"lamp"
+
+[sub_resource type="Resource" id="ch10"]
+script = ExtResource("choice")
+text = "Goodbye."
+
+[sub_resource type="Resource" id="nd11"]
+script = ExtResource("node")
+id = &"first"
+speaker = "Wenna"
+text = "A new face. Mind the water, traveller. It's been answering back."
+choices = Array[ExtResource("choice")]([SubResource("ch7"), SubResource("ch9"), SubResource("ch10")])
+
+[sub_resource type="Resource" id="cs12"]
+script = ExtResource("cons")
+kind = 1
+key = "rumour.old_wood_lights"
+
+[sub_resource type="Resource" id="cs13"]
+script = ExtResource("cons")
+kind = 0
+key = "npc.well_keeper.told_lights"
+
+[sub_resource type="Resource" id="ch14"]
+script = ExtResource("choice")
+text = "What lights?"
+consequences = Array[ExtResource("cons")]([SubResource("cs12"), SubResource("cs13")])
+next = &"lights"
+
+[sub_resource type="Resource" id="ch15"]
+script = ExtResource("choice")
+text = "I'll keep an eye on it."
+
+[sub_resource type="Resource" id="nd16"]
+script = ExtResource("node")
+id = &"reflection"
+speaker = "Wenna"
+text = "Your face shows up a moment late. Mine too, ever since the lights started in the old wood. Nobody else seems bothered."
+choices = Array[ExtResource("choice")]([SubResource("ch14"), SubResource("ch15")])
+
+[sub_resource type="Resource" id="nd17"]
+script = ExtResource("node")
+id = &"lights"
+speaker = "Wenna"
+text = "Blue ones, low between the trees north of the clearing. The notice board says don't follow them. The notice board says a lot of things."
+
+[sub_resource type="Resource" id="cd18"]
+script = ExtResource("cond")
+flag = "world.well_lamp_lit"
+test = 1
+
+[sub_resource type="Resource" id="cs19"]
+script = ExtResource("cons")
+kind = 0
+key = "world.well_lamp_lit"
+
+[sub_resource type="Resource" id="ch20"]
+script = ExtResource("choice")
+text = "Light it from my lantern."
+conditions = Array[ExtResource("cond")]([SubResource("cd18")])
+consequences = Array[ExtResource("cons")]([SubResource("cs19")])
+next = &"lamp_lit"
+
+[sub_resource type="Resource" id="ch21"]
+script = ExtResource("choice")
+text = "Not now."
+
+[sub_resource type="Resource" id="nd22"]
+script = ExtResource("node")
+id = &"lamp"
+speaker = "Wenna"
+text = "Wind took the flame three nights back, and I've no oil to spare. Folk draw water in the dark now."
+choices = Array[ExtResource("choice")]([SubResource("ch20"), SubResource("ch21")])
+
+[sub_resource type="Resource" id="nd23"]
+script = ExtResource("node")
+id = &"lamp_lit"
+speaker = "Wenna"
+text = "...There. Warm again. The water looks less like it's watching."
+
+[sub_resource type="Resource" id="cd24"]
+script = ExtResource("cond")
+flag = "world.shrine_awakened"
+test = 0
+
+[sub_resource type="Resource" id="ch25"]
+script = ExtResource("choice")
+text = "The well is glowing."
+conditions = Array[ExtResource("cond")]([SubResource("cd24")])
+next = &"glow"
+
+[sub_resource type="Resource" id="cd26"]
+script = ExtResource("cond")
+flag = "world.well_lamp_lit"
+test = 1
+
+[sub_resource type="Resource" id="ch27"]
+script = ExtResource("choice")
+text = "The lamp on the post is dark."
+conditions = Array[ExtResource("cond")]([SubResource("cd26")])
+next = &"lamp"
+
+[sub_resource type="Resource" id="ch28"]
+script = ExtResource("choice")
+text = "About the water..."
+next = &"reflection"
+
+[sub_resource type="Resource" id="ch29"]
+script = ExtResource("choice")
+text = "Goodbye."
+
+[sub_resource type="Resource" id="nd30"]
+script = ExtResource("node")
+id = &"again"
+speaker = "Wenna"
+text = "Back again. The water's still running late."
+choices = Array[ExtResource("choice")]([SubResource("ch25"), SubResource("ch27"), SubResource("ch28"), SubResource("ch29")])
+
+[sub_resource type="Resource" id="cd31"]
+script = ExtResource("cond")
+flag = "world.shrine_awakened"
+test = 0
+
+[sub_resource type="Resource" id="ch32"]
+script = ExtResource("choice")
+text = "The well is glowing."
+conditions = Array[ExtResource("cond")]([SubResource("cd31")])
+next = &"glow"
+
+[sub_resource type="Resource" id="ch33"]
+script = ExtResource("choice")
+text = "About the water..."
+next = &"reflection"
+
+[sub_resource type="Resource" id="ch34"]
+script = ExtResource("choice")
+text = "Goodbye."
+
+[sub_resource type="Resource" id="nd35"]
+script = ExtResource("node")
+id = &"lamp_thanks"
+speaker = "Wenna"
+text = "The lamp's still burning. I sleep better for it."
+choices = Array[ExtResource("choice")]([SubResource("ch32"), SubResource("ch33"), SubResource("ch34")])
+
+[sub_resource type="Resource" id="nd36"]
+script = ExtResource("node")
+id = &"glow"
+speaker = "Wenna"
+text = "Teal, ever since the old shrine woke. Something small swims down there in circles. I've named it Pim."
+
+[resource]
+script = ExtResource("data")
+id = &"well_keeper"
+entries = Array[ExtResource("choice")]([SubResource("ch3"), SubResource("ch5"), SubResource("ch6")])
+nodes = Array[ExtResource("node")]([SubResource("nd11"), SubResource("nd16"), SubResource("nd17"), SubResource("nd22"), SubResource("nd23"), SubResource("nd30"), SubResource("nd35"), SubResource("nd36")])

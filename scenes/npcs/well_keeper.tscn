@@ -1,0 +1,71 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/interaction/interactable.gd" id="interactable"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_trigger.gd" id="trigger"]
+[ext_resource type="Resource" path="res://data/dialogue/well_keeper.tres" id="dialogue"]
+[ext_resource type="Material" path="res://art/materials/roof.tres" id="shawl"]
+[ext_resource type="Material" path="res://art/materials/cloak.tres" id="cloak"]
+[ext_resource type="Material" path="res://art/materials/wood.tres" id="wood"]
+
+[sub_resource type="CapsuleShape3D" id="col"]
+radius = 0.35
+height = 1.6
+
+[sub_resource type="CapsuleMesh" id="body"]
+material = ExtResource("shawl")
+radius = 0.38
+height = 1.3
+radial_segments = 8
+rings = 2
+
+[sub_resource type="SphereMesh" id="head"]
+material = ExtResource("cloak")
+radius = 0.24
+height = 0.48
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CylinderMesh" id="bucket"]
+material = ExtResource("wood")
+top_radius = 0.16
+bottom_radius = 0.13
+height = 0.28
+radial_segments = 6
+rings = 1
+
+[sub_resource type="SphereShape3D" id="reach"]
+radius = 1.4
+
+[node name="WellKeeper" type="StaticBody3D"]
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.8, 0)
+shape = SubResource("col")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Body" type="MeshInstance3D" parent="Visual"]
+position = Vector3(0, 0.65, 0)
+mesh = SubResource("body")
+
+[node name="Head" type="MeshInstance3D" parent="Visual"]
+position = Vector3(0, 1.45, -0.05)
+mesh = SubResource("head")
+
+[node name="Bucket" type="MeshInstance3D" parent="Visual"]
+position = Vector3(0.42, 0.3, -0.1)
+mesh = SubResource("bucket")
+
+[node name="Talk" type="Area3D" parent="."]
+script = ExtResource("interactable")
+verb = "Talk"
+prompt_height = 2.0
+
+[node name="Reach" type="CollisionShape3D" parent="Talk"]
+position = Vector3(0, 0.9, 0)
+shape = SubResource("reach")
+
+[node name="Dialogue" type="Node" parent="." node_paths=PackedStringArray("interactable")]
+script = ExtResource("trigger")
+dialogue = ExtResource("dialogue")
+interactable = NodePath("../Talk")

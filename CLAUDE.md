@@ -31,9 +31,10 @@ Milestone status: `task_plan.md`, session log: `progress.md`.
 - Props that the camera must not enter need collision on their visual volume (roofs have it); tree crowns deliberately don't.
 - World memory: `GameState` autoload (`set_flag/get_flag/is_set`, `flag_changed`). Key conventions in `scripts/core/game_state.gd`. Never store world facts elsewhere.
 - Interaction: add an `Interactable` (Area3D + CollisionShape3D child, layer 4) to anything usable; `DiscoveryZone` for named places; `StateToggle` to make the world visibly react to a flag. HUD is reached via `get_tree().call_group("hud", "show_message"/"show_location", ...)`.
-- Tests: `godot --headless --path . res://tests/<name>.tscn` (exit code 0 = pass): `test_exploration_loop`, `test_audio`, `test_combat_rules`, `test_combat_world` (real clearing scan). Tests are scenes so autoloads exist.
+- Tests: `godot --headless --path . res://tests/<name>.tscn` (exit code 0 = pass): `test_exploration_loop`, `test_audio`, `test_combat_rules`, `test_combat_world` (real clearing scan), `test_dialogue`. Tests are scenes so autoloads exist.
 - Audio: never reference audio files from gameplay code. Use `AudioManager.play/play_at(&"event")`; add/replace sounds in `data/audio/sound_bank.tres`. Log external assets in `docs/ASSET-SOURCES.md`. Normalise new files (peak -1 dBFS, OGG) and set loudness in the bank.
 - Combat: world-space rules in `scripts/combat/` (`combat_space`, `action_resolver`, `combat_unit`, `combat_state`), data Resources in `scripts/combat/data/` with instances in `data/`. Presentation: `CombatArea` (world scan + trigger), `CombatController` (input + event playback), `TacticalOverlay`, `scenes/ui/combat_hud.tscn`. Never put rules in the controller: add them to `CombatState` and a test. Grid combat is obsolete.
+- Dialogue: data in `data/dialogue/*.tres` (`DialogueData` → `DialogueNode` → `DialogueChoice` + `DialogueCondition`/`DialogueConsequence`, classes in `scripts/dialogue/data/`). Conditions/consequences are GameState flags only; `EVENT` consequences reach `on_dialogue_event(id)` on the `dialogue_events` group. Logic in `DialogueRunner` (pure); `DialogueTrigger` starts it from an `Interactable`; `DialogueUI` (in main.tscn) only presents. Every file must pass `DialogueData.validate()` (checked by `test_dialogue`).
 - Two kinds of verification per milestone: system correctness (headless test) and player experience (scripted screenshots + audit in DECISIONS).
 - Windows Python: run with `PYTHONUTF8=1`, otherwise it writes cp1252 and can truncate files on encode errors.
 - Shot runs: always wrap in `timeout`; a GDScript parse error leaves the window open forever.
@@ -41,4 +42,5 @@ Milestone status: `task_plan.md`, session log: `progress.md`.
 ## Controls (current)
 WASD/arrows move, Shift run, RMB drag orbit (vertical = pitch offset), Q/E rotate, wheel zoom (in = LOOK toward horizon), F interact. Gamepad: left stick move, right stick orbit/pitch, LB/RB zoom.
 Debug: F1 overlay, F2 pixel scale, F3 post shader, F4 play the world's first CinematicReveal, F5 reload world (leave + return; state must survive), F6 start the clearing fight, F7 win the current fight.
+Dialogue: W/S or arrows/stick/D-pad select, F/A confirm, Esc/B leave, mouse hover+click.
 Combat: mouse or WASD cursor, 1/2/3 abilities, F/click confirm, Esc cancel, Space end turn (pad: A confirm, X/Y/D-pad up abilities, B cancel, Start end turn).

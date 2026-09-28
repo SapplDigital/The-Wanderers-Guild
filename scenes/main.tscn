@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/slice_region.tscn" id="3_world"]
 [ext_resource type="PackedScene" path="res://scenes/ui/exploration_hud.tscn" id="4_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/combat_hud.tscn" id="5_combat_hud"]
+[ext_resource type="Script" path="res://scripts/ui/dialogue_ui.gd" id="6_dialogue"]
 
 [sub_resource type="ShaderMaterial" id="post"]
 shader = ExtResource("2_post")
@@ -33,6 +34,9 @@ render_target_update_mode = 4
 [node name="ExplorationHUD" parent="PixelView/SubViewport" instance=ExtResource("4_hud")]
 
 [node name="CombatHUD" parent="PixelView/SubViewport" instance=ExtResource("5_combat_hud")]
+
+[node name="DialogueUI" type="CanvasLayer" parent="PixelView/SubViewport"]
+script = ExtResource("6_dialogue")
 
 [node name="DebugHUD" type="CanvasLayer" parent="."]
 
