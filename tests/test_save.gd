@@ -157,7 +157,7 @@ func _test_world() -> void:
 		_check(p.global_position.distance_to(at) < 0.05, "loaded at the saved position (%s vs %s)" % [p.global_position, at])
 		_check(p.health == 7, "health is restored")
 		_check(_same(GameState.flags, saved), "flags are exactly the saved ones after load + 10 physics steps (no discovery, no opportunity)")
-		_check(_hud(m)._message.modulate.a == 0.0 and _hud(m)._location.modulate.a == 0.0, "loading shows no message or place name")
+		_check(_hud(m)._message.modulate.a == 0.0 and _hud(m)._update.modulate.a == 0.0 and _hud(m)._location.modulate.a == 0.0, "loading shows no message or place name")
 		m.queue_free()
 		await get_tree().process_frame
 
@@ -265,9 +265,9 @@ func _test_end_to_end() -> void:
 	_check(QuestTracker.outcome(COMMON_ROOM, GameState) != null and _opening(HEARTH) == &"warm" and _opening(LODGER) == &"again",
 		"e2e: quest resolved and dialogue openings follow the loaded flags")
 	var hud := _hud(main)
-	_check(hud._message.modulate.a == 0.0 and hud._location.modulate.a == 0.0, "e2e: no announcement or place name from loading")
+	_check(hud._message.modulate.a == 0.0 and hud._update.modulate.a == 0.0 and hud._location.modulate.a == 0.0, "e2e: no announcement or place name from loading")
 	GameState.set_flag("test.poke") # a stale quest cache would announce every quest now
-	_check(hud._message.text == "", "e2e: the quest cache matches the loaded flags (a later flag change announces nothing)")
+	_check(hud._message.text == "" and hud._update.text == "", "e2e: the quest cache matches the loaded flags (a later flag change announces nothing)")
 	main.queue_free()
 	await get_tree().process_frame
 

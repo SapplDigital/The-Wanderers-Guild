@@ -15,7 +15,7 @@ var _autosave := true ## on quit; off for scripted shot runs
 
 
 func _ready() -> void:
-	_debug_label.visible = OS.is_debug_build()
+	_debug_label.visible = false # F1 / --overlay show it; a normal start never does
 	# Uniforms left at their shader default read back as null; make the toggle state explicit.
 	(_pixel_view.material as ShaderMaterial).set_shader_parameter("enabled", true)
 	var args := _cli_args()
@@ -102,8 +102,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not OS.is_debug_build():
 		return
 	if event.is_action_pressed("debug_quickload"):
-		var player: Player = _world.get_node("Player")
-		if player.input_enabled and not _rig().is_cinematic: # never tear down a fight or conversation
+		if _exploring(): # never tear down a fight, conversation or cinematic
 			load_game()
 	elif event.is_action_pressed("debug_toggle_overlay"):
 		_debug_label.visible = not _debug_label.visible
@@ -116,10 +115,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("debug_test_cinematic"):
 		_test_cinematic()
 	elif event.is_action_pressed("debug_reload_world"):
-		if not _rig().is_cinematic:
+		if _exploring():
 			_reload_world()
 	elif event.is_action_pressed("debug_start_combat"):
-		if not _rig().is_cinematic:
+		if _exploring():
 			_debug_start_combat()
 	elif event.is_action_pressed("debug_trigger_event"):
 		get_tree().call_group("event_host", "debug_evaluate")
@@ -145,6 +144,13 @@ func _rig() -> CameraController:
 	return _world.get_node("CameraRig")
 
 
+## Normal exploration: not in a fight, a conversation or a cinematic (they all take player input).
+## Debug keys that rebuild the world, start a fight or play a cinematic only act here.
+func _exploring() -> bool:
+	var player: Player = _world.get_node("Player")
+	return player.input_enabled and not _rig().is_cinematic
+
+
 ## Walks the player into the nearest CombatArea's fight (debug shortcut).
 func _debug_start_combat() -> void:
 	var player: Node3D = _world.get_node("Player")
@@ -160,7 +166,7 @@ func _debug_start_combat() -> void:
 ## discovery. Debug only: writes no flag and leaves the trigger armed.
 func _test_cinematic() -> void:
 	var reveals := _world.find_children("*", "CinematicReveal")
-	if reveals and not _rig().is_cinematic:
+	if reveals and _exploring():
 		reveals[0].play(_world.get_node("Player"), false)
 
 

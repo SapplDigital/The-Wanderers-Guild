@@ -41,8 +41,9 @@ func is_cleared() -> bool:
 	return GameState.is_set(cleared_flag())
 
 
+## Only from normal exploration: never under a conversation, a cinematic or another fight.
 func can_start() -> bool:
-	return controller == null and not is_cleared()
+	return controller == null and not is_cleared() and player.input_enabled and not camera_rig.is_cinematic
 
 
 func build_space() -> CombatSpace:

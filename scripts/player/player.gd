@@ -12,11 +12,13 @@ signal health_changed(health: int, max_health: int)
 @export var acceleration := 12.0
 @export var turn_sharpness := 12.0
 @export var max_health := 12
+@export var regen_interval := 3.0 ## seconds per HP while exploring: about one walk between encounters heals a hard fight (M14 playtest)
 
 @onready var _visual: Node3D = $Visual
 
 var move_state := MoveState.IDLE
 var input_enabled := true
+var _regen := 0.0
 var health := max_health:
 	set(value):
 		health = clampi(value, 0, max_health)
@@ -24,6 +26,7 @@ var health := max_health:
 
 
 func _physics_process(delta: float) -> void:
+	_recover(delta)
 	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back") if input_enabled else Vector2.ZERO
 	var yaw := camera_rig.global_rotation.y if camera_rig else 0.0
 	var dir := Vector3(input.x, 0.0, input.y).rotated(Vector3.UP, yaw)
@@ -42,6 +45,18 @@ func _physics_process(delta: float) -> void:
 		move_state = MoveState.RUN if running else MoveState.WALK
 	else:
 		move_state = MoveState.IDLE
+
+
+## Slow recovery between fights. Only in normal exploration (fights, conversations and cinematics
+## take player input away) and never at 0 HP. Health is already saved, so nothing else changes.
+func _recover(delta: float) -> void:
+	if not input_enabled or health <= 0 or health >= max_health:
+		_regen = 0.0
+		return
+	_regen += delta
+	if _regen >= regen_interval:
+		_regen -= regen_interval
+		health += 1
 
 
 ## Small physical response to an interaction: turn toward the target and lean in briefly.

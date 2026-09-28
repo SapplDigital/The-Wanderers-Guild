@@ -29,6 +29,7 @@ func _ready() -> void:
 	await _first_reveal(main)
 	await _no_replay(main)
 	await _fresh_and_debug(main)
+	await _debug_keys_outside_exploration(main)
 	main.queue_free()
 	_remove(PATH)
 	GameState.flags = {}
@@ -176,6 +177,44 @@ func _fresh_and_debug(main: Node) -> void:
 	_check(_rig(main).is_cinematic, "F4 still replays after the discovery")
 	await _until(func() -> bool: return not _rig(main).is_cinematic)
 	_check(GameState.is_set(FLAG) and _player(main).input_enabled, "the debug replay leaves the discovery and control intact")
+
+
+## M14: F4/F5/F6 only act in normal exploration. Inside a conversation or a fight they do nothing,
+## and a reveal never starts (it would hand input back when it ends and free the player mid-fight).
+func _debug_keys_outside_exploration(main: Node) -> void:
+	GameState.flags = {EventDirector.SEED: 1, EventHost.LAST_REGION: "village"}
+	main._reload_world()
+	await _physics(3)
+	var world: Node = main._world
+	var player := _player(main)
+	(world.get_node("Village/WellKeeper/Talk") as Interactable).interact(player)
+	await get_tree().process_frame
+	_check(not player.input_enabled, "(setup) a conversation is open")
+	for key in [&"debug_test_cinematic", &"debug_start_combat", &"debug_reload_world"]:
+		main._unhandled_input(_action(key))
+	await _physics(2)
+	_check(main._world == world and not _rig(main).is_cinematic, "F4 / F5 do nothing during a conversation")
+	_check(world.find_children("*", "CombatArea").all(func(c: CombatArea) -> bool: return c.controller == null),
+		"F6 doesn't start a fight under a conversation")
+	get_tree().get_first_node_in_group("dialogue_ui").leave()
+	await get_tree().process_frame
+	_check(player.input_enabled, "(setup) the conversation is closed")
+
+	main._unhandled_input(_action(&"debug_start_combat"))
+	await _physics(3)
+	var fights := world.find_children("*", "CombatArea").filter(func(c: CombatArea) -> bool: return c.controller != null)
+	_check(fights.size() == 1 and not player.input_enabled, "(setup) F6 starts one fight from exploration")
+	main._unhandled_input(_action(&"debug_test_cinematic"))
+	(world.get_node("Forest/OverlookReveal") as CinematicReveal).play(player, false)
+	main._unhandled_input(_action(&"debug_start_combat"))
+	main._unhandled_input(_action(&"debug_reload_world"))
+	await _physics(2)
+	_check(not _rig(main).is_cinematic and not player.input_enabled, "no reveal starts mid-fight, so input stays with the fight")
+	_check(main._world == world and world.find_children("*", "CombatArea").filter(
+		func(c: CombatArea) -> bool: return c.controller != null).size() == 1, "F5 / F6 don't rebuild the world or start a second fight")
+	fights[0].controller.debug_win()
+	await _until(func() -> bool: return fights[0].controller == null)
+	_check(player.input_enabled, "control returns when the fight ends")
 
 
 ## Shortened timings (the path, markers and aim stay real). A fast turn so the aim converges.

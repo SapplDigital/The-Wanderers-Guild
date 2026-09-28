@@ -59,7 +59,7 @@ text = "Leave it for now."
 [sub_resource type="Resource" id="nd11"]
 script = ExtResource("node")
 id = &"cold"
-text = "The hearth is cold and choked with soot. The table has lost a leg, and the shutters bang in the wind. Nobody would pay to sit in here."
+text = "Your guild's common room: yours now, and so is the rent. The hearth is cold and choked with soot. The table has lost a leg, and the shutters bang in the wind. Nobody would pay to sit in here."
 choices = Array[ExtResource("choice")]([SubResource("ch9"), SubResource("ch10")])
 
 [sub_resource type="Resource" id="cd12"]

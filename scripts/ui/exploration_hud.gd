@@ -2,7 +2,8 @@ extends CanvasLayer
 ## Exploration HUD. Lives inside the 640x360 pixel viewport, so it is pixel-crisp and
 ## matches the world. Deliberately sparse: health pips, a cardinal-only compass,
 ## a contextual prompt anchored to the focused object, a place-name card on discovery,
-## one message line, and the active quest's current objective. Everything fades out during cinematics.
+## one message line, a quest-update line above it, and every active quest's current objective.
+## Everything fades out during cinematics.
 
 const HP_PER_PIP := 2
 const PIP_FULL := Color(0.95, 0.62, 0.36)
@@ -16,11 +17,14 @@ const QUEST_DIR := "res://data/quests/"
 @onready var _location: Label = $Root/Location
 @onready var _message: Label = $Root/Message
 @onready var _quest: Label = $Root/Quest
+@onready var _update: Label = $Root/Update ## quest changes: own line, so flavour text can't overwrite them
 
 var _player: Player
 var _rig: CameraController
 var _location_tween: Tween
 var _message_tween: Tween
+var _update_tween: Tween
+var _update_held := false ## paused by us while a conversation is open
 var _quests: Array[QuestData] = []
 var _quest_text := {} ## quest id -> last shown status, to announce changes once
 
@@ -29,6 +33,7 @@ func _ready() -> void:
 	add_to_group("hud")
 	_location.modulate.a = 0.0
 	_message.modulate.a = 0.0
+	_update.modulate.a = 0.0
 	for file in DirAccess.get_files_at(QUEST_DIR):
 		if file.ends_with(".tres"):
 			_quests.append(load(QUEST_DIR + file))
@@ -45,11 +50,12 @@ func bind(world: Node) -> void:
 	_on_health_changed(_player.health, _player.max_health)
 	_refresh_quests(false) # flags may have been replaced (load): rebuild the cache without announcing
 	# A new world means we're somewhere else: drop leftover place names and messages.
-	for tw in [_location_tween, _message_tween]:
+	for tw in [_location_tween, _message_tween, _update_tween]:
 		if tw:
 			tw.kill()
 	_location.modulate.a = 0.0
 	_message.modulate.a = 0.0
+	_update.modulate.a = 0.0
 
 
 func show_location(title: String) -> void:
@@ -62,7 +68,31 @@ func show_message(text: String) -> void:
 	_message_tween = _fade(_message, _message_tween, 2.0 + text.length() * 0.05)
 
 
+## A quest update waits (paused before it fades in) while a conversation covers the bottom of the
+## screen, so a change made by a dialogue reply shows once the player is back in the world.
+func show_update(text: String) -> void:
+	_update.text = text
+	_update_tween = _fade(_update, _update_tween, 2.5 + text.length() * 0.05)
+	_update_held = false
+	if _talking():
+		_update.modulate.a = 0.0 # a still-visible older update mustn't stand in for it
+		_update_tween.pause()
+		_update_held = true
+
+
+func _talking() -> bool:
+	var ui := get_tree().get_first_node_in_group("dialogue_ui")
+	return ui != null and ui.is_open()
+
+
 func _process(delta: float) -> void:
+	if _update_tween and _update_tween.is_valid():
+		if _talking() and _update_tween.is_running():
+			_update_tween.pause()
+			_update_held = true
+		elif _update_held and not _talking():
+			_update_tween.play()
+			_update_held = false
 	if not is_instance_valid(_player):
 		return
 	var in_cinematic := _rig.state == CameraController.State.CINEMATIC
@@ -81,9 +111,10 @@ func _input(event: InputEvent) -> void:
 	InputGlyphs.track(event)
 
 
-## Shows the first active quest's current objective; announces objective changes and endings.
+## Shows every active quest's current objective (title + objective, stacked); announces objective
+## changes and endings on the update line.
 func _refresh_quests(announce: bool) -> void:
-	_quest.text = ""
+	var lines: PackedStringArray = []
 	for quest in _quests:
 		var status := ""
 		var ended := QuestTracker.outcome(quest, GameState)
@@ -92,12 +123,11 @@ func _refresh_quests(announce: bool) -> void:
 		elif QuestTracker.is_active(quest, GameState):
 			var objective := QuestTracker.current_objective(quest, GameState)
 			status = objective.text if objective else ""
-			if _quest.text == "":
-				_quest.text = "%s
-%s" % [quest.title, status]
+			lines.append("%s\n%s" % [quest.title, status])
 		if announce and status != "" and status != _quest_text.get(quest.id, ""):
-			show_message("%s: %s" % [quest.title, status])
+			show_update("%s: %s" % [quest.title, status])
 		_quest_text[quest.id] = status
+	_quest.text = "\n\n".join(lines) # a blank line keeps each quest's title with its objective
 
 
 ## Combat has its own HUD; the exploration layer steps aside (messages included).

@@ -42,7 +42,11 @@ func _on_body_entered(body: Node3D) -> void:
 
 
 ## record = false is the F4 debug replay: the same shot, but nothing is written and the trigger stays armed.
+## Refused while a fight, conversation or another cinematic owns the player's input: the reveal
+## hands input back when it ends, so starting inside one of those would unlock the player mid-fight.
 func play(player: Player, record := true) -> void:
+	if not player.input_enabled or camera_rig.is_cinematic:
+		return
 	player.input_enabled = false
 	_pose = Node3D.new()
 	add_child(_pose)

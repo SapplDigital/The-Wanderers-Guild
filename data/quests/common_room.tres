@@ -37,7 +37,7 @@ test = 0
 
 [sub_resource type="Resource" id="ob7"]
 script = ExtResource("objective")
-text = "Repair the common room at the hearth."
+text = "Bring the boards and the coal to the hearth."
 done_when = Array[ExtResource("cond")]([SubResource("cd6")])
 
 [sub_resource type="Resource" id="cd8"]

@@ -8,6 +8,7 @@ const OWNER := preload("res://data/dialogue/ring_owner.tres")
 const WENNA := preload("res://data/dialogue/well_keeper.tres")
 const HOARD := preload("res://data/dialogue/midge_hoard.tres")
 const Q := "quest.missing_ring."
+const MAIN := preload("res://scenes/main.tscn")
 const CLEARED := "encounter.forest_edge_midges.cleared"
 
 var _failures := 0
@@ -18,6 +19,7 @@ func _ready() -> void:
 	_test_tracker()
 	_test_routes()
 	await _test_in_world()
+	await _test_hud()
 	print("quest: %s (%d failures)" % ["OK" if _failures == 0 else "FAILED", _failures])
 	get_tree().quit(1 if _failures else 0)
 
@@ -160,6 +162,45 @@ func _test_in_world() -> void:
 	world.queue_free()
 	await get_tree().process_frame
 	GameState.flags = {}
+
+
+## M14 HUD: every active quest is listed, and an objective change gets its own update line, so
+## flavour text can't overwrite it and a conversation holds it back until the panel closes.
+func _test_hud() -> void:
+	GameState.flags = {EventDirector.SEED: 1, EventHost.LAST_REGION: "village"}
+	var main := MAIN.instantiate()
+	add_child(main)
+	await _frames(3)
+	var hud: Node = main.get_node("PixelView/SubViewport/ExplorationHUD")
+	var player: Player = main._world.get_node("Player")
+	GameState.set_flag(Q + "accepted")
+	GameState.set_flag("quest.common_room.accepted")
+	var corner: String = hud._quest.text
+	_check("The Missing Ring" in corner and "Repair the Common Room" in corner and "Find out where the ring went." in corner
+		and "Find timber" in corner, "HUD lists both active quests with their objectives")
+
+	(main._world.get_node("Forest/AbandonedCamp/SalvageBoards") as Interactable).interact(player)
+	await _frames(30)
+	_check(hud._message.text.begins_with("Good boards") and hud._message.modulate.a > 0.0, "the boards' own text shows")
+	_check("Find a live coal" in hud._update.text and hud._update.modulate.a > 0.0, "...and the new objective shows beside it, not overwritten")
+
+	(main._world.get_node("Village/WellKeeper/Talk") as Interactable).interact(player)
+	await _frames(2)
+	GameState.set_flag(Q + "knows_hoard") # as a reply would
+	await _frames(40)
+	_check("Get the ring back." in hud._update.text and hud._update.modulate.a == 0.0, "an update made in a conversation waits behind the panel")
+	get_tree().get_first_node_in_group("dialogue_ui").leave()
+	await _frames(40)
+	_check(hud._update.modulate.a > 0.5, "...and shows once the conversation closes")
+	_check("Get the ring back." in hud._quest.text, "the corner line follows the new objective")
+	main.queue_free()
+	await get_tree().process_frame
+	GameState.flags = {}
+
+
+func _frames(n: int) -> void:
+	for i in n:
+		await get_tree().process_frame
 
 
 func _objective() -> String:

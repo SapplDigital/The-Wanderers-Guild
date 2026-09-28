@@ -43,7 +43,7 @@ func _test_routes() -> void:
 	_check(_hint_replies() == ["And a live coal?"], "the hearth only hints at what's still missing")
 	_talk(WENNA, [EMBER_LINE])
 	_check(GameState.is_set(Q + "has_ember") and not _replies(WENNA).has(EMBER_LINE), "Wenna gives one coal, once")
-	_check(_objective() == "Repair the common room at the hearth.", "both materials: repair is next")
+	_check(_objective() == "Bring the boards and the coal to the hearth.", "both materials: repair is next")
 	_talk(HEARTH, [REPAIR_LINE])
 	var o := QuestTracker.outcome(QUEST, GameState)
 	_check(GameState.is_set(REPAIRED) and o != null and o.id == &"repaired" and not QuestTracker.is_active(QUEST, GameState),
@@ -77,6 +77,13 @@ func _test_routes() -> void:
 	_talk(LODGER, ["What brings you here?", "I'll go up and look."])
 	_check(GameState.is_set("npc.lodger.told_island"), "the lodger's rumour points at the island")
 	_check(_opening(LODGER) == &"again", "later she asks about the overlook")
+	GameState.set_flag("discovered.overlook")
+	_check(_opening(LODGER) == &"overlook", "after the overlook she knows you've been up there")
+	_talk(LODGER, ["It hung right over the mountains."])
+	_check(_opening(LODGER) == &"overlook", "...and keeps acknowledging it")
+	_check("I've been up there already." in _island_replies(true), "meeting her after the overlook, you can say you've been")
+	_check(not "I've been up there already." in _island_replies(false), "...a reply that isn't offered before the overlook")
+	GameState.flags.erase("discovered.overlook")
 	GameState.flags = {}
 
 
@@ -95,6 +102,11 @@ func _test_in_world() -> void:
 	var outside := hall.global_position + Vector3(7, 0, 0)
 
 	_check(zone.camera_rig == rig and zone.cutaway == cutaway, "the interior is wired to the camera and the cutaway")
+	_check(not cutaway.visible and arm.collision_mask == 0 and zone.inside, "a new game starts inside the common room, cut away")
+	var hearth: Interactable = hall.get_node("HearthUse")
+	_check((player.get_node("Interactor") as Interactor).focus == hearth, "...with the hearth in reach (the first prompt)")
+	player.global_position = outside
+	await _physics(4)
 	_check(cutaway.visible and arm.collision_mask == 1 and not zone.inside, "outside: roof shown, camera collides")
 	_check((hall.get_node("Damaged") as Node3D).visible and not (hall.get_node("Repaired") as Node3D).visible,
 		"before the repair the room is damaged")
@@ -160,8 +172,8 @@ func _test_in_world() -> void:
 	_check((hall.get_node("Cutaway/LitWindows") as Node3D).is_visible_in_tree(), "outside, the windows glow")
 	_check(GameState.get_flag(EventDirector.OPPORTUNITY) == opportunity, "reloading in the guild is not an event opportunity")
 	world.free()
-	world = await _load_world() # the real F5 path: the player respawns outside
-	_check((world.get_node("Village/GuildHall/Cutaway") as Node3D).visible, "a plain reload starts with the roof shown")
+	world = await _load_world() # the real F5 path: the player respawns at the start, in the common room
+	_check(not (world.get_node("Village/GuildHall/Cutaway") as Node3D).visible, "a plain reload starts in the common room, cut away")
 	world.queue_free()
 	ui.queue_free()
 	await get_tree().process_frame
@@ -256,6 +268,18 @@ func _talk(data: DialogueData, picks: Array) -> void:
 func _opening(data: DialogueData) -> StringName:
 	var run := DialogueRunner.new(data, Flags.new(GameState.flags.duplicate()))
 	return run.node.id if run.start() else &""
+
+
+## Maren's replies after "What brings you here?" on a first meeting, with or without the overlook.
+func _island_replies(overlook: bool) -> Array:
+	var flags := GameState.flags.duplicate()
+	flags.erase("npc.lodger.met")
+	flags["discovered.overlook"] = overlook
+	var run := DialogueRunner.new(LODGER, Flags.new(flags))
+	run.start()
+	var texts := run.choices().map(func(c: DialogueChoice) -> String: return c.text)
+	run.choose(texts.find("What brings you here?"))
+	return run.choices().map(func(c: DialogueChoice) -> String: return c.text)
 
 
 func _replies(data: DialogueData) -> Array:

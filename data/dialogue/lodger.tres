@@ -22,6 +22,15 @@ conditions = Array[ExtResource("cond")]([SubResource("cd1")])
 consequences = Array[ExtResource("cons")]([SubResource("cs2")])
 next = &"first"
 
+[sub_resource type="Resource" id="cd15"]
+script = ExtResource("cond")
+flag = "discovered.overlook"
+
+[sub_resource type="Resource" id="ch16"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd15")])
+next = &"overlook"
+
 [sub_resource type="Resource" id="ch4"]
 script = ExtResource("choice")
 next = &"again"
@@ -56,12 +65,18 @@ consequences = Array[ExtResource("cons")]([SubResource("cs8")])
 script = ExtResource("choice")
 text = "Islands don't drift."
 
+[sub_resource type="Resource" id="ch17"]
+script = ExtResource("choice")
+text = "I've been up there already."
+conditions = Array[ExtResource("cond")]([SubResource("cd15")])
+next = &"overlook"
+
 [sub_resource type="Resource" id="nd11"]
 script = ExtResource("node")
 id = &"island"
 speaker = "Maren"
 text = "I map things that won't stay put. That island hanging over the forest isn't where my chart puts it. Climb to the overlook past the old wood and watch it against the clouds. Tell me if it's drifting."
-choices = Array[ExtResource("choice")]([SubResource("ch9"), SubResource("ch10")])
+choices = Array[ExtResource("choice")]([SubResource("ch17"), SubResource("ch9"), SubResource("ch10")])
 
 [sub_resource type="Resource" id="ch12"]
 script = ExtResource("choice")
@@ -79,8 +94,26 @@ speaker = "Maren"
 text = "Warm in here, now. Have you been up to the overlook yet?"
 choices = Array[ExtResource("choice")]([SubResource("ch12"), SubResource("ch13")])
 
+[sub_resource type="Resource" id="ch18"]
+script = ExtResource("choice")
+text = "It hung right over the mountains."
+next = &"pinned"
+
+[sub_resource type="Resource" id="nd19"]
+script = ExtResource("node")
+id = &"overlook"
+speaker = "Maren"
+text = "You've been up to the overlook. Nobody comes down from there looking at the ground. So? Was it where my chart says?"
+choices = Array[ExtResource("choice")]([SubResource("ch18"), SubResource("ch13")])
+
+[sub_resource type="Resource" id="nd20"]
+script = ExtResource("node")
+id = &"pinned"
+speaker = "Maren"
+text = "Over the mountains. My chart has it further east. Then it is drifting. I'll put a pin in it and keep watching. You keep walking."
+
 [resource]
 script = ExtResource("data")
 id = &"lodger"
-entries = Array[ExtResource("choice")]([SubResource("ch3"), SubResource("ch4")])
-nodes = Array[ExtResource("node")]([SubResource("nd7"), SubResource("nd11"), SubResource("nd14")])
+entries = Array[ExtResource("choice")]([SubResource("ch3"), SubResource("ch16"), SubResource("ch4")])
+nodes = Array[ExtResource("node")]([SubResource("nd7"), SubResource("nd11"), SubResource("nd14"), SubResource("nd19"), SubResource("nd20")])
