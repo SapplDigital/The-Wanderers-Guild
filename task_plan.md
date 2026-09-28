@@ -12,7 +12,7 @@ Order from the master prompt §21. Definition of done: master prompt §23 / GDD 
 - [x] M6 world-space combat migration: continuous metre movement, terrain/obstacles/elevation, temporary tactical overlay, real clearing scan, rules tests, actual-clearing debug victory/exit, visible bypass and rendered player-turn overlay verified (2026-09-28).
 - [x] M7 Enemy AI CLOSED: data-selected Brain Dispatcher (ActorData.ai_brain) with melee-beast, ranged/utility and guardian demonstration brains; authored optional encounters (boars, Glimmer Midges at the forest-edge stones, Mossbound Guardian at the Broken Gate); guardian telegraph ring + move hint; rules/world tests and rendered midge/guardian smoke runs verified (2026-09-28).
 - [x] M8 Dialogue CLOSED: Resource dialogue data + validator, pure DialogueRunner (flag-only conditions, flag/event consequences), DialogueTrigger on Interactable, compact dialogue UI (keyboard/mouse/pad), Wenna the well-keeper with a visible world consequence; test_dialogue 33/33 + regression + rendered checks (2026-09-28).
-- [ ] M9 Quest: The Missing Ring (2+ outcomes)
+- [x] M9 Quest: The Missing Ring CLOSED: declarative QuestData + pure QuestTracker over flags; Hollis, midge hoard (learn from Wenna or find it; fight or trade), return/keep outcomes with visible consequences; quest HUD line; test_quest 48/48 + regression + rendered routes (2026-09-28).
 - [ ] M10 WorldEventDirector + Glowing Fish (variants)
 - [ ] M11 Guild upgrade: Repair the Common Room
 - [ ] M12 Save/load (versioned)
@@ -20,6 +20,7 @@ Order from the master prompt §21. Definition of done: master prompt §23 / GDD 
 - [ ] M14 Polish + playtest
 
 ## Open risks
+- Backlog: minimal inventory/item support (ItemData + carried items + compact HUD list). In slice scope (GDD 18.1 inventory-lite) but unscheduled; M9 keeps the ring and glint stone as flags.
 - Combat UX backlog (playtest): "smart attack movement" (click a target out of reach → walk into range and attack). Not scheduled; not part of M8.
 - Texel shimmer during fast rotation (not measurable in screenshots — check by hand).
 - Distant ruin textures alias into noise at 100 m+; may need a lower-detail ruin material or mipmap bias.

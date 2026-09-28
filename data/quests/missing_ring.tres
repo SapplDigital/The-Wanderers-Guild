@@ -1,0 +1,71 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/quests/data/quest_data.gd" id="quest"]
+[ext_resource type="Script" path="res://scripts/quests/data/quest_objective.gd" id="objective"]
+[ext_resource type="Script" path="res://scripts/quests/data/quest_outcome.gd" id="outcome"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_condition.gd" id="cond"]
+
+[sub_resource type="Resource" id="cd1"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.accepted"
+test = 0
+
+[sub_resource type="Resource" id="cd2"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.knows_hoard"
+test = 0
+
+[sub_resource type="Resource" id="ob3"]
+script = ExtResource("objective")
+text = "Find out where the ring went."
+done_when = Array[ExtResource("cond")]([SubResource("cd2")])
+
+[sub_resource type="Resource" id="cd4"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.has_ring"
+test = 0
+
+[sub_resource type="Resource" id="ob5"]
+script = ExtResource("objective")
+text = "Get the ring back."
+done_when = Array[ExtResource("cond")]([SubResource("cd4")])
+
+[sub_resource type="Resource" id="cd6"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.resolved"
+test = 0
+
+[sub_resource type="Resource" id="ob7"]
+script = ExtResource("objective")
+text = "Take the ring to Hollis, or don't."
+done_when = Array[ExtResource("cond")]([SubResource("cd6")])
+
+[sub_resource type="Resource" id="cd8"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.returned"
+test = 0
+
+[sub_resource type="Resource" id="oc9"]
+script = ExtResource("outcome")
+id = &"returned"
+text = "Hollis has the ring back."
+conditions = Array[ExtResource("cond")]([SubResource("cd8")])
+
+[sub_resource type="Resource" id="cd10"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.kept"
+test = 0
+
+[sub_resource type="Resource" id="oc11"]
+script = ExtResource("outcome")
+id = &"kept"
+text = "You kept the ring."
+conditions = Array[ExtResource("cond")]([SubResource("cd10")])
+
+[resource]
+script = ExtResource("quest")
+id = &"missing_ring"
+title = "The Missing Ring"
+accepted_when = Array[ExtResource("cond")]([SubResource("cd1")])
+objectives = Array[ExtResource("objective")]([SubResource("ob3"), SubResource("ob5"), SubResource("ob7")])
+outcomes = Array[ExtResource("outcome")]([SubResource("oc9"), SubResource("oc11")])

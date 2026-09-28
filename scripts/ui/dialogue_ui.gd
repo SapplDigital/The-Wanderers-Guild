@@ -132,7 +132,7 @@ func _build() -> void:
 	add_child(root)
 	_panel = PanelContainer.new()
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.07, 0.06, 0.09, 0.94)
+	style.bg_color = Color(0.07, 0.06, 0.09, 1.0)
 	style.border_color = Color(0.45, 0.36, 0.28, 0.9)
 	style.set_border_width_all(1)
 	style.set_content_margin_all(6)

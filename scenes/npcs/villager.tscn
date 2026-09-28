@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" path="res://scripts/interaction/interactable.gd" id="interactable"]
 [ext_resource type="Script" path="res://scripts/dialogue/dialogue_trigger.gd" id="trigger"]
-[ext_resource type="Resource" path="res://data/dialogue/well_keeper.tres" id="dialogue"]
 [ext_resource type="Material" path="res://art/materials/roof.tres" id="shawl"]
 [ext_resource type="Material" path="res://art/materials/cloak.tres" id="cloak"]
 [ext_resource type="Material" path="res://art/materials/wood.tres" id="wood"]
@@ -36,7 +35,7 @@ rings = 1
 [sub_resource type="SphereShape3D" id="reach"]
 radius = 1.4
 
-[node name="WellKeeper" type="StaticBody3D"]
+[node name="Villager" type="StaticBody3D"]
 
 [node name="Collision" type="CollisionShape3D" parent="."]
 position = Vector3(0, 0.8, 0)
@@ -67,5 +66,4 @@ shape = SubResource("reach")
 
 [node name="Dialogue" type="Node" parent="." node_paths=PackedStringArray("interactable")]
 script = ExtResource("trigger")
-dialogue = ExtResource("dialogue")
 interactable = NodePath("../Talk")

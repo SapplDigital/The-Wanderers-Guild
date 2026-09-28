@@ -1,0 +1,137 @@
+[gd_resource type="Resource" script_class="DialogueData" format=3]
+
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_data.gd" id="data"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_node.gd" id="node"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_choice.gd" id="choice"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_condition.gd" id="cond"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_consequence.gd" id="cons"]
+
+[sub_resource type="Resource" id="cd1"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.has_ring"
+test = 0
+
+[sub_resource type="Resource" id="ch2"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd1")])
+next = &"empty"
+
+[sub_resource type="Resource" id="cd3"]
+script = ExtResource("cond")
+flag = "encounter.forest_edge_midges.cleared"
+test = 0
+
+[sub_resource type="Resource" id="cs4"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.knows_hoard"
+
+[sub_resource type="Resource" id="ch5"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd3")])
+consequences = Array[ExtResource("cons")]([SubResource("cs4")])
+next = &"unguarded"
+
+[sub_resource type="Resource" id="cd6"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.has_glint_stone"
+test = 0
+
+[sub_resource type="Resource" id="cs7"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.knows_hoard"
+
+[sub_resource type="Resource" id="ch8"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd6")])
+consequences = Array[ExtResource("cons")]([SubResource("cs7")])
+next = &"offer"
+
+[sub_resource type="Resource" id="cs9"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.knows_hoard"
+
+[sub_resource type="Resource" id="ch10"]
+script = ExtResource("choice")
+consequences = Array[ExtResource("cons")]([SubResource("cs9")])
+next = &"guarded"
+
+[sub_resource type="Resource" id="nd11"]
+script = ExtResource("node")
+id = &"empty"
+text = "Only pebbles and midge-dust now."
+
+[sub_resource type="Resource" id="cs12"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.has_ring"
+
+[sub_resource type="Resource" id="ch13"]
+script = ExtResource("choice")
+text = "Take the ring."
+consequences = Array[ExtResource("cons")]([SubResource("cs12")])
+next = &"taken"
+
+[sub_resource type="Resource" id="ch14"]
+script = ExtResource("choice")
+text = "Leave it."
+
+[sub_resource type="Resource" id="nd15"]
+script = ExtResource("node")
+id = &"unguarded"
+text = "The midges are gone. Among the stones lie buttons, a spoon, bottle glass, and a plain gold ring scratched like a little river."
+choices = Array[ExtResource("choice")]([SubResource("ch13"), SubResource("ch14")])
+
+[sub_resource type="Resource" id="nd16"]
+script = ExtResource("node")
+id = &"taken"
+text = "You pocket the ring. It's warmer than it should be."
+
+[sub_resource type="Resource" id="ch17"]
+script = ExtResource("choice")
+text = "Pull your hand back."
+
+[sub_resource type="Resource" id="nd18"]
+script = ExtResource("node")
+id = &"guarded"
+text = "The midges have piled bright things between the stones: buttons, bottle glass, a plain gold ring. When you reach in, they swirl down, humming."
+choices = Array[ExtResource("choice")]([SubResource("ch17")])
+
+[sub_resource type="Resource" id="cs19"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.has_ring"
+
+[sub_resource type="Resource" id="cs20"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.traded"
+
+[sub_resource type="Resource" id="ch21"]
+script = ExtResource("choice")
+text = "Offer Wenna's glint stone."
+consequences = Array[ExtResource("cons")]([SubResource("cs19"), SubResource("cs20")])
+next = &"traded"
+
+[sub_resource type="Resource" id="ch22"]
+script = ExtResource("choice")
+text = "Leave."
+
+[sub_resource type="Resource" id="nd23"]
+script = ExtResource("node")
+id = &"offer"
+text = "The midges hover over their pile of bright things. The gold ring sits on top."
+choices = Array[ExtResource("choice")]([SubResource("ch21"), SubResource("ch22")])
+
+[sub_resource type="Resource" id="nd24"]
+script = ExtResource("node")
+id = &"traded"
+text = "One midge takes the stone, turns it in the light, and drops the ring at your feet. The swarm hums, pleased."
+
+[resource]
+script = ExtResource("data")
+id = &"midge_hoard"
+entries = Array[ExtResource("choice")]([SubResource("ch2"), SubResource("ch5"), SubResource("ch8"), SubResource("ch10")])
+nodes = Array[ExtResource("node")]([SubResource("nd11"), SubResource("nd15"), SubResource("nd16"), SubResource("nd18"), SubResource("nd23"), SubResource("nd24")])

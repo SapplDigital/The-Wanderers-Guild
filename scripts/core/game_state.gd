@@ -14,7 +14,8 @@ var flags := {}
 
 
 func set_flag(key: String, value: Variant = true) -> void:
-	if flags.get(key) == value:
+	var old: Variant = flags.get(key)
+	if typeof(old) == typeof(value) and old == value: # values may be bools or strings; == across types errors
 		return
 	flags[key] = value
 	flag_changed.emit(key, value)
@@ -25,4 +26,5 @@ func get_flag(key: String, default: Variant = null) -> Variant:
 
 
 func is_set(key: String) -> bool:
-	return flags.get(key, false) == true
+	var value: Variant = flags.get(key, false)
+	return value is bool and value # only boolean true counts as set

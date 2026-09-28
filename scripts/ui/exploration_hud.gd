@@ -2,11 +2,12 @@ extends CanvasLayer
 ## Exploration HUD. Lives inside the 640x360 pixel viewport, so it is pixel-crisp and
 ## matches the world. Deliberately sparse: health pips, a cardinal-only compass,
 ## a contextual prompt anchored to the focused object, a place-name card on discovery,
-## and one message line. Everything fades out during cinematics.
+## one message line, and the active quest's current objective. Everything fades out during cinematics.
 
 const HP_PER_PIP := 2
 const PIP_FULL := Color(0.95, 0.62, 0.36)
 const PIP_EMPTY := Color(0.2, 0.18, 0.22, 0.8)
+const QUEST_DIR := "res://data/quests/"
 
 @onready var _root: Control = $Root
 @onready var _pips: HBoxContainer = $Root/Pips
@@ -14,17 +15,25 @@ const PIP_EMPTY := Color(0.2, 0.18, 0.22, 0.8)
 @onready var _prompt: Label = $Root/Prompt
 @onready var _location: Label = $Root/Location
 @onready var _message: Label = $Root/Message
+@onready var _quest: Label = $Root/Quest
 
 var _player: Player
 var _rig: CameraController
 var _location_tween: Tween
 var _message_tween: Tween
+var _quests: Array[QuestData] = []
+var _quest_text := {} ## quest id -> last shown status, to announce changes once
 
 
 func _ready() -> void:
 	add_to_group("hud")
 	_location.modulate.a = 0.0
 	_message.modulate.a = 0.0
+	for file in DirAccess.get_files_at(QUEST_DIR):
+		if file.ends_with(".tres"):
+			_quests.append(load(QUEST_DIR + file))
+	GameState.flag_changed.connect(func(_k: String, _v: Variant) -> void: _refresh_quests(true))
+	_refresh_quests(false)
 
 
 func bind(world: Node) -> void:
@@ -69,6 +78,25 @@ func _process(delta: float) -> void:
 
 func _input(event: InputEvent) -> void:
 	InputGlyphs.track(event)
+
+
+## Shows the first active quest's current objective; announces objective changes and endings.
+func _refresh_quests(announce: bool) -> void:
+	_quest.text = ""
+	for quest in _quests:
+		var status := ""
+		var ended := QuestTracker.outcome(quest, GameState)
+		if ended:
+			status = ended.text
+		elif QuestTracker.is_active(quest, GameState):
+			var objective := QuestTracker.current_objective(quest, GameState)
+			status = objective.text if objective else ""
+			if _quest.text == "":
+				_quest.text = "%s
+%s" % [quest.title, status]
+		if announce and status != "" and status != _quest_text.get(quest.id, ""):
+			show_message("%s: %s" % [quest.title, status])
+		_quest_text[quest.id] = status
 
 
 ## Combat has its own HUD; the exploration layer steps aside (messages included).

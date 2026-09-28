@@ -14,8 +14,8 @@ func passes(flags: Object) -> bool:
 	var current: Variant = flags.get_flag(flag)
 	match test:
 		Test.IS_SET:
-			return current == true
+			return current is bool and current
 		Test.NOT_SET:
-			return current != true
+			return not (current is bool and current)
 		_:
 			return current != null and str(current) == value

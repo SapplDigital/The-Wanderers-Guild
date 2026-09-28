@@ -1,6 +1,11 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" path="res://scenes/npcs/well_keeper.tscn" id="well_keeper"]
+[ext_resource type="PackedScene" path="res://scenes/npcs/villager.tscn" id="villager"]
+[ext_resource type="Resource" path="res://data/dialogue/well_keeper.tres" id="dlg_well"]
+[ext_resource type="Resource" path="res://data/dialogue/ring_owner.tres" id="dlg_owner"]
+[ext_resource type="Resource" path="res://data/dialogue/midge_hoard.tres" id="dlg_hoard"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_trigger.gd" id="dialogue_trigger"]
+[ext_resource type="Material" path="res://art/materials/foliage.tres" id="owner_cloth"]
 [ext_resource type="Material" path="res://art/materials/lantern_glow.tres" id="lantern_glow"]
 [ext_resource type="PackedScene" path="res://scenes/world/props/tree.tscn" id="tree"]
 [ext_resource type="PackedScene" path="res://scenes/world/props/rock.tscn" id="rock"]
@@ -154,6 +159,17 @@ radius = 0.25
 height = 0.3
 radial_segments = 6
 rings = 2
+
+[sub_resource type="BoxMesh" id="ring_notice"]
+size = Vector3(0.4, 0.5, 0.02)
+
+[sub_resource type="BoxMesh" id="hoard_glint"]
+material = ExtResource("lantern_glow")
+size = Vector3(0.12, 0.05, 0.12)
+
+[sub_resource type="BoxMesh" id="hoard_pile"]
+material = ExtResource("stone")
+size = Vector3(0.6, 0.16, 0.45)
 
 [sub_resource type="BoxMesh" id="well_lamp_bracket"]
 material = ExtResource("wood")
@@ -312,6 +328,8 @@ prompt_height = 2.2
 state_id = "notice_board"
 message = "Most notices are years old. One is fresh, pinned with a fishhook: 'LIGHTS IN THE OLD WOOD. DO NOT FOLLOW THEM.'"
 message_repeat = "'DO NOT FOLLOW THEM.' Someone has added, in smaller letters: 'we mean it'."
+condition_flag = "quest.missing_ring.kept"
+condition_message = "A new notice, in careful letters: 'LOST: a plain gold ring, scratched like a little river. Please. - Hollis'"
 
 [node name="Reach" type="CollisionShape3D" parent="Village/ReadNotices"]
 shape = SubResource("reach_s")
@@ -329,9 +347,47 @@ condition_message = "The water glows a faint teal now. Something small is swimmi
 [node name="Reach" type="CollisionShape3D" parent="Village/LookInWell"]
 shape = SubResource("reach_m")
 
-[node name="WellKeeper" parent="Village" instance=ExtResource("well_keeper")]
+[node name="WellKeeper" parent="Village" instance=ExtResource("villager")]
 position = Vector3(-1.7, 0, 1.5)
 rotation_degrees = Vector3(0, -60, 0)
+
+[node name="Dialogue" parent="Village/WellKeeper"]
+dialogue = ExtResource("dlg_well")
+
+[node name="RingOwner" parent="Village" instance=ExtResource("villager")]
+position = Vector3(-5.5, 0, 3.6)
+rotation_degrees = Vector3(0, -120, 0)
+
+[node name="Body" parent="Village/RingOwner/Visual"]
+surface_material_override/0 = ExtResource("owner_cloth")
+
+[node name="Dialogue" parent="Village/RingOwner"]
+dialogue = ExtResource("dlg_owner")
+
+[node name="RingReturnedLamp" type="Node3D" parent="Village"]
+script = ExtResource("toggle")
+flag = "quest.missing_ring.returned"
+
+[node name="Lamp" type="MeshInstance3D" parent="Village/RingReturnedLamp"]
+position = Vector3(-1.1, 2.1, 11.85)
+mesh = SubResource("well_lamp_lit")
+
+[node name="Light" type="OmniLight3D" parent="Village/RingReturnedLamp"]
+position = Vector3(-1.1, 2.0, 11.4)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.8
+omni_range = 7.0
+
+[node name="RingKeptNotice" type="Node3D" parent="Village"]
+position = Vector3(-8, 0, 5)
+rotation_degrees = Vector3(0, 90, 0)
+script = ExtResource("toggle")
+flag = "quest.missing_ring.kept"
+
+[node name="Note" type="MeshInstance3D" parent="Village/RingKeptNotice"]
+position = Vector3(0.52, 1.55, 0.08)
+rotation_degrees = Vector3(0, 0, -3)
+mesh = SubResource("ring_notice")
 
 [node name="WellLampBracket" type="MeshInstance3D" parent="Village"]
 position = Vector3(-1.05, 1.95, 0.5)
@@ -2495,6 +2551,34 @@ scale = Vector3(0.9, 0.81, 0.9)
 [node name="Stone2" parent="Forest/MidgeStones" instance=ExtResource("rock")]
 position = Vector3(5.00, 0.00, -133.50)
 scale = Vector3(1.1, 0.99, 1.1)
+
+[node name="Hoard" type="Area3D" parent="Forest/MidgeStones"]
+position = Vector3(-0.5, 0, -123.4)
+script = ExtResource("interactable")
+verb = "Search"
+prompt_height = 0.8
+
+[node name="Reach" type="CollisionShape3D" parent="Forest/MidgeStones/Hoard"]
+shape = SubResource("reach_s")
+
+[node name="Dialogue" type="Node" parent="Forest/MidgeStones/Hoard" node_paths=PackedStringArray("interactable")]
+script = ExtResource("dialogue_trigger")
+dialogue = ExtResource("dlg_hoard")
+interactable = NodePath("..")
+
+[node name="Glint0" type="MeshInstance3D" parent="Forest/MidgeStones/Hoard"]
+position = Vector3(0, 0.06, 0)
+rotation_degrees = Vector3(0, 30, 0)
+mesh = SubResource("hoard_glint")
+
+[node name="Glint1" type="MeshInstance3D" parent="Forest/MidgeStones/Hoard"]
+position = Vector3(0.25, 0.05, 0.15)
+rotation_degrees = Vector3(0, -20, 0)
+mesh = SubResource("hoard_glint")
+
+[node name="Pebbles" type="MeshInstance3D" parent="Forest/MidgeStones/Hoard"]
+position = Vector3(-0.1, 0.08, 0.1)
+mesh = SubResource("hoard_pile")
 
 [node name="Mud" parent="Forest/MidgeStones" type="MeshInstance3D"]
 position = Vector3(1.50, 0.03, -127.00)

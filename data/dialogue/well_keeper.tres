@@ -24,185 +24,398 @@ next = &"first"
 
 [sub_resource type="Resource" id="cd4"]
 script = ExtResource("cond")
-flag = "world.well_lamp_lit"
+flag = "quest.missing_ring.kept"
 test = 0
 
-[sub_resource type="Resource" id="ch5"]
-script = ExtResource("choice")
-conditions = Array[ExtResource("cond")]([SubResource("cd4")])
-next = &"lamp_thanks"
+[sub_resource type="Resource" id="cd5"]
+script = ExtResource("cond")
+flag = "npc.well_keeper.remarked_ring"
+test = 1
 
-[sub_resource type="Resource" id="ch6"]
-script = ExtResource("choice")
-next = &"again"
+[sub_resource type="Resource" id="cs6"]
+script = ExtResource("cons")
+kind = 0
+key = "npc.well_keeper.remarked_ring"
 
 [sub_resource type="Resource" id="ch7"]
 script = ExtResource("choice")
-text = "Answering back?"
-next = &"reflection"
+conditions = Array[ExtResource("cond")]([SubResource("cd4"), SubResource("cd5")])
+consequences = Array[ExtResource("cons")]([SubResource("cs6")])
+next = &"kept_remark"
 
 [sub_resource type="Resource" id="cd8"]
 script = ExtResource("cond")
 flag = "world.well_lamp_lit"
-test = 1
+test = 0
 
 [sub_resource type="Resource" id="ch9"]
 script = ExtResource("choice")
-text = "The lamp on the post is dark."
 conditions = Array[ExtResource("cond")]([SubResource("cd8")])
-next = &"lamp"
+next = &"lamp_thanks"
 
 [sub_resource type="Resource" id="ch10"]
 script = ExtResource("choice")
+next = &"again"
+
+[sub_resource type="Resource" id="ch11"]
+script = ExtResource("choice")
+text = "Answering back?"
+next = &"reflection"
+
+[sub_resource type="Resource" id="cd12"]
+script = ExtResource("cond")
+flag = "world.well_lamp_lit"
+test = 1
+
+[sub_resource type="Resource" id="ch13"]
+script = ExtResource("choice")
+text = "The lamp on the post is dark."
+conditions = Array[ExtResource("cond")]([SubResource("cd12")])
+next = &"lamp"
+
+[sub_resource type="Resource" id="cd14"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.accepted"
+test = 0
+
+[sub_resource type="Resource" id="cd15"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.knows_hoard"
+test = 1
+
+[sub_resource type="Resource" id="cd16"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.has_ring"
+test = 1
+
+[sub_resource type="Resource" id="ch17"]
+script = ExtResource("choice")
+text = "Have you seen a lost gold ring?"
+conditions = Array[ExtResource("cond")]([SubResource("cd14"), SubResource("cd15"), SubResource("cd16")])
+next = &"ring_midges"
+
+[sub_resource type="Resource" id="cd18"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.knows_hoard"
+test = 0
+
+[sub_resource type="Resource" id="cd19"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.has_glint_stone"
+test = 1
+
+[sub_resource type="Resource" id="cd20"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.has_ring"
+test = 1
+
+[sub_resource type="Resource" id="ch21"]
+script = ExtResource("choice")
+text = "The midges at the forest edge are hoarding bright things."
+conditions = Array[ExtResource("cond")]([SubResource("cd18"), SubResource("cd19"), SubResource("cd20")])
+next = &"midge_trade"
+
+[sub_resource type="Resource" id="ch22"]
+script = ExtResource("choice")
 text = "Goodbye."
 
-[sub_resource type="Resource" id="nd11"]
+[sub_resource type="Resource" id="nd23"]
 script = ExtResource("node")
 id = &"first"
 speaker = "Wenna"
 text = "A new face. Mind the water, traveller. It's been answering back."
-choices = Array[ExtResource("choice")]([SubResource("ch7"), SubResource("ch9"), SubResource("ch10")])
+choices = Array[ExtResource("choice")]([SubResource("ch11"), SubResource("ch13"), SubResource("ch17"), SubResource("ch21"), SubResource("ch22")])
 
-[sub_resource type="Resource" id="cs12"]
+[sub_resource type="Resource" id="cs24"]
 script = ExtResource("cons")
 kind = 1
 key = "rumour.old_wood_lights"
 
-[sub_resource type="Resource" id="cs13"]
+[sub_resource type="Resource" id="cs25"]
 script = ExtResource("cons")
 kind = 0
 key = "npc.well_keeper.told_lights"
 
-[sub_resource type="Resource" id="ch14"]
+[sub_resource type="Resource" id="ch26"]
 script = ExtResource("choice")
 text = "What lights?"
-consequences = Array[ExtResource("cons")]([SubResource("cs12"), SubResource("cs13")])
+consequences = Array[ExtResource("cons")]([SubResource("cs24"), SubResource("cs25")])
 next = &"lights"
 
-[sub_resource type="Resource" id="ch15"]
+[sub_resource type="Resource" id="ch27"]
 script = ExtResource("choice")
 text = "I'll keep an eye on it."
 
-[sub_resource type="Resource" id="nd16"]
+[sub_resource type="Resource" id="nd28"]
 script = ExtResource("node")
 id = &"reflection"
 speaker = "Wenna"
 text = "Your face shows up a moment late. Mine too, ever since the lights started in the old wood. Nobody else seems bothered."
-choices = Array[ExtResource("choice")]([SubResource("ch14"), SubResource("ch15")])
+choices = Array[ExtResource("choice")]([SubResource("ch26"), SubResource("ch27")])
 
-[sub_resource type="Resource" id="nd17"]
+[sub_resource type="Resource" id="nd29"]
 script = ExtResource("node")
 id = &"lights"
 speaker = "Wenna"
 text = "Blue ones, low between the trees north of the clearing. The notice board says don't follow them. The notice board says a lot of things."
 
-[sub_resource type="Resource" id="cd18"]
+[sub_resource type="Resource" id="cd30"]
 script = ExtResource("cond")
 flag = "world.well_lamp_lit"
 test = 1
 
-[sub_resource type="Resource" id="cs19"]
+[sub_resource type="Resource" id="cs31"]
 script = ExtResource("cons")
 kind = 0
 key = "world.well_lamp_lit"
 
-[sub_resource type="Resource" id="ch20"]
+[sub_resource type="Resource" id="ch32"]
 script = ExtResource("choice")
 text = "Light it from my lantern."
-conditions = Array[ExtResource("cond")]([SubResource("cd18")])
-consequences = Array[ExtResource("cons")]([SubResource("cs19")])
+conditions = Array[ExtResource("cond")]([SubResource("cd30")])
+consequences = Array[ExtResource("cons")]([SubResource("cs31")])
 next = &"lamp_lit"
 
-[sub_resource type="Resource" id="ch21"]
+[sub_resource type="Resource" id="ch33"]
 script = ExtResource("choice")
 text = "Not now."
 
-[sub_resource type="Resource" id="nd22"]
+[sub_resource type="Resource" id="nd34"]
 script = ExtResource("node")
 id = &"lamp"
 speaker = "Wenna"
 text = "Wind took the flame three nights back, and I've no oil to spare. Folk draw water in the dark now."
-choices = Array[ExtResource("choice")]([SubResource("ch20"), SubResource("ch21")])
+choices = Array[ExtResource("choice")]([SubResource("ch32"), SubResource("ch33")])
 
-[sub_resource type="Resource" id="nd23"]
+[sub_resource type="Resource" id="nd35"]
 script = ExtResource("node")
 id = &"lamp_lit"
 speaker = "Wenna"
 text = "...There. Warm again. The water looks less like it's watching."
 
-[sub_resource type="Resource" id="cd24"]
+[sub_resource type="Resource" id="cd36"]
 script = ExtResource("cond")
 flag = "world.shrine_awakened"
 test = 0
 
-[sub_resource type="Resource" id="ch25"]
+[sub_resource type="Resource" id="ch37"]
 script = ExtResource("choice")
 text = "The well is glowing."
-conditions = Array[ExtResource("cond")]([SubResource("cd24")])
+conditions = Array[ExtResource("cond")]([SubResource("cd36")])
 next = &"glow"
 
-[sub_resource type="Resource" id="cd26"]
+[sub_resource type="Resource" id="cd38"]
 script = ExtResource("cond")
 flag = "world.well_lamp_lit"
 test = 1
 
-[sub_resource type="Resource" id="ch27"]
+[sub_resource type="Resource" id="ch39"]
 script = ExtResource("choice")
 text = "The lamp on the post is dark."
-conditions = Array[ExtResource("cond")]([SubResource("cd26")])
+conditions = Array[ExtResource("cond")]([SubResource("cd38")])
 next = &"lamp"
 
-[sub_resource type="Resource" id="ch28"]
+[sub_resource type="Resource" id="cd40"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.accepted"
+test = 0
+
+[sub_resource type="Resource" id="cd41"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.knows_hoard"
+test = 1
+
+[sub_resource type="Resource" id="cd42"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.has_ring"
+test = 1
+
+[sub_resource type="Resource" id="ch43"]
+script = ExtResource("choice")
+text = "Have you seen a lost gold ring?"
+conditions = Array[ExtResource("cond")]([SubResource("cd40"), SubResource("cd41"), SubResource("cd42")])
+next = &"ring_midges"
+
+[sub_resource type="Resource" id="cd44"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.knows_hoard"
+test = 0
+
+[sub_resource type="Resource" id="cd45"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.has_glint_stone"
+test = 1
+
+[sub_resource type="Resource" id="cd46"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.has_ring"
+test = 1
+
+[sub_resource type="Resource" id="ch47"]
+script = ExtResource("choice")
+text = "The midges at the forest edge are hoarding bright things."
+conditions = Array[ExtResource("cond")]([SubResource("cd44"), SubResource("cd45"), SubResource("cd46")])
+next = &"midge_trade"
+
+[sub_resource type="Resource" id="ch48"]
 script = ExtResource("choice")
 text = "About the water..."
 next = &"reflection"
 
-[sub_resource type="Resource" id="ch29"]
+[sub_resource type="Resource" id="ch49"]
 script = ExtResource("choice")
 text = "Goodbye."
 
-[sub_resource type="Resource" id="nd30"]
+[sub_resource type="Resource" id="nd50"]
 script = ExtResource("node")
 id = &"again"
 speaker = "Wenna"
 text = "Back again. The water's still running late."
-choices = Array[ExtResource("choice")]([SubResource("ch25"), SubResource("ch27"), SubResource("ch28"), SubResource("ch29")])
+choices = Array[ExtResource("choice")]([SubResource("ch37"), SubResource("ch39"), SubResource("ch43"), SubResource("ch47"), SubResource("ch48"), SubResource("ch49")])
 
-[sub_resource type="Resource" id="cd31"]
+[sub_resource type="Resource" id="cd51"]
 script = ExtResource("cond")
 flag = "world.shrine_awakened"
 test = 0
 
-[sub_resource type="Resource" id="ch32"]
+[sub_resource type="Resource" id="ch52"]
 script = ExtResource("choice")
 text = "The well is glowing."
-conditions = Array[ExtResource("cond")]([SubResource("cd31")])
+conditions = Array[ExtResource("cond")]([SubResource("cd51")])
 next = &"glow"
 
-[sub_resource type="Resource" id="ch33"]
+[sub_resource type="Resource" id="cd53"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.accepted"
+test = 0
+
+[sub_resource type="Resource" id="cd54"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.knows_hoard"
+test = 1
+
+[sub_resource type="Resource" id="cd55"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.has_ring"
+test = 1
+
+[sub_resource type="Resource" id="ch56"]
+script = ExtResource("choice")
+text = "Have you seen a lost gold ring?"
+conditions = Array[ExtResource("cond")]([SubResource("cd53"), SubResource("cd54"), SubResource("cd55")])
+next = &"ring_midges"
+
+[sub_resource type="Resource" id="cd57"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.knows_hoard"
+test = 0
+
+[sub_resource type="Resource" id="cd58"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.has_glint_stone"
+test = 1
+
+[sub_resource type="Resource" id="cd59"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.has_ring"
+test = 1
+
+[sub_resource type="Resource" id="ch60"]
+script = ExtResource("choice")
+text = "The midges at the forest edge are hoarding bright things."
+conditions = Array[ExtResource("cond")]([SubResource("cd57"), SubResource("cd58"), SubResource("cd59")])
+next = &"midge_trade"
+
+[sub_resource type="Resource" id="ch61"]
 script = ExtResource("choice")
 text = "About the water..."
 next = &"reflection"
 
-[sub_resource type="Resource" id="ch34"]
+[sub_resource type="Resource" id="ch62"]
 script = ExtResource("choice")
 text = "Goodbye."
 
-[sub_resource type="Resource" id="nd35"]
+[sub_resource type="Resource" id="nd63"]
 script = ExtResource("node")
 id = &"lamp_thanks"
 speaker = "Wenna"
 text = "The lamp's still burning. I sleep better for it."
-choices = Array[ExtResource("choice")]([SubResource("ch32"), SubResource("ch33"), SubResource("ch34")])
+choices = Array[ExtResource("choice")]([SubResource("ch52"), SubResource("ch56"), SubResource("ch60"), SubResource("ch61"), SubResource("ch62")])
 
-[sub_resource type="Resource" id="nd36"]
+[sub_resource type="Resource" id="nd64"]
 script = ExtResource("node")
 id = &"glow"
 speaker = "Wenna"
 text = "Teal, ever since the old shrine woke. Something small swims down there in circles. I've named it Pim."
 
+[sub_resource type="Resource" id="cs65"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.knows_hoard"
+
+[sub_resource type="Resource" id="ch66"]
+script = ExtResource("choice")
+text = "Could I get it back without a fight?"
+consequences = Array[ExtResource("cons")]([SubResource("cs65")])
+next = &"midge_trade"
+
+[sub_resource type="Resource" id="cs67"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.knows_hoard"
+
+[sub_resource type="Resource" id="ch68"]
+script = ExtResource("choice")
+text = "Then I'll go and take it back."
+consequences = Array[ExtResource("cons")]([SubResource("cs67")])
+
+[sub_resource type="Resource" id="nd69"]
+script = ExtResource("node")
+id = &"ring_midges"
+speaker = "Wenna"
+text = "A ring? The Glimmer Midges carry off anything that shines. They pile it up among the stones at the forest edge."
+choices = Array[ExtResource("choice")]([SubResource("ch66"), SubResource("ch68")])
+
+[sub_resource type="Resource" id="cs70"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.has_glint_stone"
+
+[sub_resource type="Resource" id="cs71"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.knows_hoard"
+
+[sub_resource type="Resource" id="ch72"]
+script = ExtResource("choice")
+text = "Take the glint stone."
+consequences = Array[ExtResource("cons")]([SubResource("cs70"), SubResource("cs71")])
+
+[sub_resource type="Resource" id="cs73"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.knows_hoard"
+
+[sub_resource type="Resource" id="ch74"]
+script = ExtResource("choice")
+text = "Keep it. I'll manage."
+consequences = Array[ExtResource("cons")]([SubResource("cs73")])
+
+[sub_resource type="Resource" id="nd75"]
+script = ExtResource("node")
+id = &"midge_trade"
+speaker = "Wenna"
+text = "They're traders more than thieves. Offer them something that glints brighter and they'll swap. Here: a stone from the bottom of the well. It's been shining since the lights came."
+choices = Array[ExtResource("choice")]([SubResource("ch72"), SubResource("ch74")])
+
+[sub_resource type="Resource" id="nd76"]
+script = ExtResource("node")
+id = &"kept_remark"
+speaker = "Wenna"
+text = "Hollis has pinned a notice about a lost ring. You wouldn't know anything about that, would you?"
+
 [resource]
 script = ExtResource("data")
 id = &"well_keeper"
-entries = Array[ExtResource("choice")]([SubResource("ch3"), SubResource("ch5"), SubResource("ch6")])
-nodes = Array[ExtResource("node")]([SubResource("nd11"), SubResource("nd16"), SubResource("nd17"), SubResource("nd22"), SubResource("nd23"), SubResource("nd30"), SubResource("nd35"), SubResource("nd36")])
+entries = Array[ExtResource("choice")]([SubResource("ch3"), SubResource("ch7"), SubResource("ch9"), SubResource("ch10")])
+nodes = Array[ExtResource("node")]([SubResource("nd23"), SubResource("nd28"), SubResource("nd29"), SubResource("nd34"), SubResource("nd35"), SubResource("nd50"), SubResource("nd63"), SubResource("nd64"), SubResource("nd69"), SubResource("nd75"), SubResource("nd76")])

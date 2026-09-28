@@ -1,0 +1,192 @@
+[gd_resource type="Resource" script_class="DialogueData" format=3]
+
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_data.gd" id="data"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_node.gd" id="node"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_choice.gd" id="choice"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_condition.gd" id="cond"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_consequence.gd" id="cons"]
+
+[sub_resource type="Resource" id="cd1"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.returned"
+test = 0
+
+[sub_resource type="Resource" id="ch2"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd1")])
+next = &"thanks"
+
+[sub_resource type="Resource" id="cd3"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.kept"
+test = 0
+
+[sub_resource type="Resource" id="ch4"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd3")])
+next = &"still_looking"
+
+[sub_resource type="Resource" id="cd5"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.has_ring"
+test = 0
+
+[sub_resource type="Resource" id="ch6"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd5")])
+next = &"found"
+
+[sub_resource type="Resource" id="cd7"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.accepted"
+test = 0
+
+[sub_resource type="Resource" id="ch8"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd7")])
+next = &"waiting"
+
+[sub_resource type="Resource" id="ch9"]
+script = ExtResource("choice")
+next = &"request"
+
+[sub_resource type="Resource" id="cs10"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.accepted"
+
+[sub_resource type="Resource" id="ch11"]
+script = ExtResource("choice")
+text = "I'll look for it."
+consequences = Array[ExtResource("cons")]([SubResource("cs10")])
+next = &"promised"
+
+[sub_resource type="Resource" id="ch12"]
+script = ExtResource("choice")
+text = "Not right now."
+
+[sub_resource type="Resource" id="nd13"]
+script = ExtResource("node")
+id = &"request"
+speaker = "Hollis"
+text = "You there, from the guild? I've lost my grandmother's ring. Somewhere between here and the forest edge, the night the lights came."
+choices = Array[ExtResource("choice")]([SubResource("ch11"), SubResource("ch12")])
+
+[sub_resource type="Resource" id="nd14"]
+script = ExtResource("node")
+id = &"promised"
+speaker = "Hollis"
+text = "Thank you. I'd look myself, but the forest hums at me now."
+
+[sub_resource type="Resource" id="ch15"]
+script = ExtResource("choice")
+text = "Where did you last have it?"
+next = &"last_seen"
+
+[sub_resource type="Resource" id="ch16"]
+script = ExtResource("choice")
+text = "Still looking."
+
+[sub_resource type="Resource" id="nd17"]
+script = ExtResource("node")
+id = &"waiting"
+speaker = "Hollis"
+text = "Any luck? It's plain gold, with a scratch across it like a little river."
+choices = Array[ExtResource("choice")]([SubResource("ch15"), SubResource("ch16")])
+
+[sub_resource type="Resource" id="nd18"]
+script = ExtResource("node")
+id = &"last_seen"
+speaker = "Hollis"
+text = "At the forest edge, by the stones. Something bright buzzed past my hands, and then it was gone."
+
+[sub_resource type="Resource" id="cs19"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.returned"
+
+[sub_resource type="Resource" id="cs20"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.resolved"
+
+[sub_resource type="Resource" id="cs21"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.kept"
+value = "false"
+
+[sub_resource type="Resource" id="ch22"]
+script = ExtResource("choice")
+text = "Give the ring back."
+consequences = Array[ExtResource("cons")]([SubResource("cs19"), SubResource("cs20"), SubResource("cs21")])
+next = &"returned"
+
+[sub_resource type="Resource" id="cs23"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.kept"
+
+[sub_resource type="Resource" id="cs24"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.missing_ring.resolved"
+
+[sub_resource type="Resource" id="ch25"]
+script = ExtResource("choice")
+text = "No. I found nothing."
+consequences = Array[ExtResource("cons")]([SubResource("cs23"), SubResource("cs24")])
+next = &"lied"
+
+[sub_resource type="Resource" id="nd26"]
+script = ExtResource("node")
+id = &"found"
+speaker = "Hollis"
+text = "Is that... you found it?"
+choices = Array[ExtResource("choice")]([SubResource("ch22"), SubResource("ch25")])
+
+[sub_resource type="Resource" id="nd27"]
+script = ExtResource("node")
+id = &"returned"
+speaker = "Hollis"
+text = "It's warm. It's never warm. ...Thank you. I'll hang a lamp by my door tonight, so the guild always knows where a friend lives."
+
+[sub_resource type="Resource" id="nd28"]
+script = ExtResource("node")
+id = &"lied"
+speaker = "Hollis"
+text = "Oh. Well. I'll pin up a notice. Someone might have seen it."
+
+[sub_resource type="Resource" id="nd29"]
+script = ExtResource("node")
+id = &"thanks"
+speaker = "Hollis"
+text = "See the lamp by my door? It stays lit for you."
+
+[sub_resource type="Resource" id="cd30"]
+script = ExtResource("cond")
+flag = "quest.missing_ring.has_ring"
+test = 0
+
+[sub_resource type="Resource" id="ch31"]
+script = ExtResource("choice")
+text = "Actually... I did find it."
+conditions = Array[ExtResource("cond")]([SubResource("cd30")])
+next = &"found"
+
+[sub_resource type="Resource" id="ch32"]
+script = ExtResource("choice")
+text = "I'll keep an eye out."
+
+[sub_resource type="Resource" id="nd33"]
+script = ExtResource("node")
+id = &"still_looking"
+speaker = "Hollis"
+text = "Still no sign of it. Maybe the forest will give it back."
+choices = Array[ExtResource("choice")]([SubResource("ch31"), SubResource("ch32")])
+
+[resource]
+script = ExtResource("data")
+id = &"ring_owner"
+entries = Array[ExtResource("choice")]([SubResource("ch2"), SubResource("ch4"), SubResource("ch6"), SubResource("ch8"), SubResource("ch9")])
+nodes = Array[ExtResource("node")]([SubResource("nd13"), SubResource("nd14"), SubResource("nd17"), SubResource("nd18"), SubResource("nd26"), SubResource("nd27"), SubResource("nd28"), SubResource("nd29"), SubResource("nd33")])
