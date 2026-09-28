@@ -1,5 +1,8 @@
 [gd_scene format=3]
 
+[ext_resource type="Script" path="res://scripts/events/event_host.gd" id="event_host"]
+[ext_resource type="Script" path="res://scripts/events/event_region.gd" id="event_region"]
+[ext_resource type="Resource" path="res://data/dialogue/fish_bucket.tres" id="dlg_bucket"]
 [ext_resource type="PackedScene" path="res://scenes/npcs/villager.tscn" id="villager"]
 [ext_resource type="Resource" path="res://data/dialogue/well_keeper.tres" id="dlg_well"]
 [ext_resource type="Resource" path="res://data/dialogue/ring_owner.tres" id="dlg_owner"]
@@ -159,6 +162,26 @@ radius = 0.25
 height = 0.3
 radial_segments = 6
 rings = 2
+
+[sub_resource type="BoxMesh" id="well_fish"]
+material = ExtResource("lantern_glow")
+size = Vector3(0.34, 0.06, 0.14)
+
+[sub_resource type="CylinderMesh" id="fish_bucket"]
+material = ExtResource("wood")
+top_radius = 0.26
+bottom_radius = 0.22
+height = 0.38
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="bucket_glow"]
+material = ExtResource("lantern_glow")
+top_radius = 0.22
+bottom_radius = 0.22
+height = 0.02
+radial_segments = 8
+rings = 1
 
 [sub_resource type="BoxMesh" id="ring_notice"]
 size = Vector3(0.4, 0.5, 0.02)
@@ -415,6 +438,108 @@ position = Vector3(-1.05, 1.75, 1.3)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.8
 omni_range = 7.0
+
+[node name="WellFish" type="Node3D" parent="Village"]
+script = ExtResource("toggle")
+flag = "world.well_fish"
+
+[node name="Fish0" type="MeshInstance3D" parent="Village/WellFish"]
+position = Vector3(0.3, 0.83, 0.15)
+rotation_degrees = Vector3(0, 30, 0)
+mesh = SubResource("well_fish")
+
+[node name="Fish1" type="MeshInstance3D" parent="Village/WellFish"]
+position = Vector3(-0.35, 0.83, -0.1)
+rotation_degrees = Vector3(0, -70, 0)
+mesh = SubResource("well_fish")
+
+[node name="Fish2" type="MeshInstance3D" parent="Village/WellFish"]
+position = Vector3(0.05, 0.83, -0.4)
+rotation_degrees = Vector3(0, 110, 0)
+mesh = SubResource("well_fish")
+
+[node name="Light" type="OmniLight3D" parent="Village/WellFish"]
+position = Vector3(0, 1.3, 0)
+light_color = Color(1, 0.82, 0.35, 1)
+light_energy = 0.7
+omni_range = 5.0
+
+[node name="FishBucket" type="Area3D" parent="Village"]
+position = Vector3(1.6, 0, 0.9)
+script = ExtResource("interactable")
+verb = "Look in the bucket"
+prompt_height = 0.9
+
+[node name="Reach" type="CollisionShape3D" parent="Village/FishBucket"]
+shape = SubResource("reach_s")
+
+[node name="Dialogue" type="Node" parent="Village/FishBucket" node_paths=PackedStringArray("interactable")]
+script = ExtResource("dialogue_trigger")
+dialogue = ExtResource("dlg_bucket")
+interactable = NodePath("..")
+
+[node name="Bucket" type="MeshInstance3D" parent="Village/FishBucket"]
+position = Vector3(0, 0.19, 0)
+mesh = SubResource("fish_bucket")
+
+[node name="Glow" type="Node3D" parent="Village/FishBucket"]
+script = ExtResource("toggle")
+flag = "world.well_fish"
+
+[node name="Fish" type="MeshInstance3D" parent="Village/FishBucket/Glow"]
+position = Vector3(0, 0.39, 0)
+mesh = SubResource("bucket_glow")
+
+[node name="Light" type="OmniLight3D" parent="Village/FishBucket/Glow"]
+position = Vector3(0, 0.7, 0)
+light_color = Color(1, 0.82, 0.35, 1)
+light_energy = 0.8
+omni_range = 1.8
+
+[node name="PondGlow" type="Node3D" parent="Village"]
+script = ExtResource("toggle")
+flag = "world.pond_glows"
+
+[node name="Fish0" type="MeshInstance3D" parent="Village/PondGlow"]
+position = Vector3(16.2, 0.08, 16.1)
+rotation_degrees = Vector3(0, 20, 0)
+mesh = SubResource("well_fish")
+
+[node name="Fish1" type="MeshInstance3D" parent="Village/PondGlow"]
+position = Vector3(18.0, 0.08, 17.4)
+rotation_degrees = Vector3(0, -40, 0)
+mesh = SubResource("well_fish")
+
+[node name="Fish2" type="MeshInstance3D" parent="Village/PondGlow"]
+position = Vector3(20.3, 0.08, 15.8)
+rotation_degrees = Vector3(0, 75, 0)
+mesh = SubResource("well_fish")
+
+[node name="Fish3" type="MeshInstance3D" parent="Village/PondGlow"]
+position = Vector3(21.8, 0.08, 18.6)
+rotation_degrees = Vector3(0, 10, 0)
+mesh = SubResource("well_fish")
+
+[node name="Fish4" type="MeshInstance3D" parent="Village/PondGlow"]
+position = Vector3(17.4, 0.08, 19.9)
+rotation_degrees = Vector3(0, -15, 0)
+mesh = SubResource("well_fish")
+
+[node name="Fish5" type="MeshInstance3D" parent="Village/PondGlow"]
+position = Vector3(19.6, 0.08, 20.4)
+rotation_degrees = Vector3(0, 120, 0)
+mesh = SubResource("well_fish")
+
+[node name="Fish6" type="MeshInstance3D" parent="Village/PondGlow"]
+position = Vector3(22.6, 0.08, 16.4)
+rotation_degrees = Vector3(0, -60, 0)
+mesh = SubResource("well_fish")
+
+[node name="Light" type="OmniLight3D" parent="Village/PondGlow"]
+position = Vector3(19, 1.2, 18)
+light_color = Color(1, 0.82, 0.35, 1)
+light_energy = 1.6
+omni_range = 8.0
 
 [node name="WellGlow" type="Node3D" parent="Village"]
 script = ExtResource("toggle")
@@ -2624,6 +2749,7 @@ position = Vector3(-7.00, 0.00, -22.00)
 script = ExtResource("interactable")
 verb = "Pick berries"
 state_id = "berry_bush_0"
+sets_flag = "world.berries_picked"
 once = true
 prompt_height = 1.2
 message = "A handful of night-berries. They taste faintly of rain."
@@ -2661,6 +2787,7 @@ position = Vector3(9.00, 0.00, -50.00)
 script = ExtResource("interactable")
 verb = "Pick berries"
 state_id = "berry_bush_1"
+sets_flag = "world.berries_picked"
 once = true
 prompt_height = 1.2
 message = "A handful of night-berries. They taste faintly of rain."
@@ -2698,6 +2825,7 @@ position = Vector3(-24.00, 0.00, -66.00)
 script = ExtResource("interactable")
 verb = "Pick berries"
 state_id = "berry_bush_2"
+sets_flag = "world.berries_picked"
 once = true
 prompt_height = 1.2
 message = "A handful of night-berries. They taste faintly of rain."
@@ -2735,6 +2863,7 @@ position = Vector3(40.00, 0.00, -60.00)
 script = ExtResource("interactable")
 verb = "Pick berries"
 state_id = "berry_bush_3"
+sets_flag = "world.berries_picked"
 once = true
 prompt_height = 1.2
 message = "A handful of night-berries. They taste faintly of rain."
@@ -2881,3 +3010,24 @@ mesh = SubResource("mountain_mesh")
 position = Vector3(467.29, 72.07, -724.77)
 scale = Vector3(137, 144, 137)
 mesh = SubResource("mountain_mesh")
+
+[node name="Events" type="Node" parent="." node_paths=PackedStringArray("player", "camera_rig")]
+script = ExtResource("event_host")
+player = NodePath("../Player")
+camera_rig = NodePath("../CameraRig")
+
+[node name="VillageRegion" type="Area3D" parent="Events"]
+script = ExtResource("event_region")
+region = &"village"
+
+[node name="Shape" type="CollisionShape3D" parent="Events/VillageRegion"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("amb_village_zone")
+
+[node name="ForestRegion" type="Area3D" parent="Events"]
+script = ExtResource("event_region")
+region = &"forest"
+
+[node name="Shape" type="CollisionShape3D" parent="Events/ForestRegion"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 5, -70)
+shape = SubResource("amb_forest_zone")

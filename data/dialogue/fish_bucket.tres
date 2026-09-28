@@ -1,0 +1,186 @@
+[gd_resource type="Resource" script_class="DialogueData" format=3]
+
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_data.gd" id="data"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_node.gd" id="node"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_choice.gd" id="choice"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_condition.gd" id="cond"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_consequence.gd" id="cons"]
+
+[sub_resource type="Resource" id="cd1"]
+script = ExtResource("cond")
+flag = "world.well_fish"
+test = 0
+
+[sub_resource type="Resource" id="cd2"]
+script = ExtResource("cond")
+flag = "event.glowing_fish.variant"
+test = 2
+value = "magical_leak"
+
+[sub_resource type="Resource" id="ch3"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd1"), SubResource("cd2")])
+next = &"magical_leak"
+
+[sub_resource type="Resource" id="cd4"]
+script = ExtResource("cond")
+flag = "world.well_fish"
+test = 0
+
+[sub_resource type="Resource" id="cd5"]
+script = ExtResource("cond")
+flag = "event.glowing_fish.variant"
+test = 2
+value = "sleeping_spirit"
+
+[sub_resource type="Resource" id="ch6"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd4"), SubResource("cd5")])
+next = &"sleeping_spirit"
+
+[sub_resource type="Resource" id="cd7"]
+script = ExtResource("cond")
+flag = "world.well_fish"
+test = 0
+
+[sub_resource type="Resource" id="cd8"]
+script = ExtResource("cond")
+flag = "event.glowing_fish.variant"
+test = 2
+value = "world_anomaly"
+
+[sub_resource type="Resource" id="ch9"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd7"), SubResource("cd8")])
+next = &"world_anomaly"
+
+[sub_resource type="Resource" id="cd10"]
+script = ExtResource("cond")
+flag = "event.glowing_fish.resolved"
+test = 0
+
+[sub_resource type="Resource" id="ch11"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd10")])
+next = &"after"
+
+[sub_resource type="Resource" id="ch12"]
+script = ExtResource("choice")
+next = &"empty"
+
+[sub_resource type="Resource" id="cs13"]
+script = ExtResource("cons")
+kind = 0
+key = "world.well_fish"
+value = "false"
+
+[sub_resource type="Resource" id="cs14"]
+script = ExtResource("cons")
+kind = 0
+key = "world.pond_glows"
+
+[sub_resource type="Resource" id="cs15"]
+script = ExtResource("cons")
+kind = 0
+key = "event.glowing_fish.resolved"
+
+[sub_resource type="Resource" id="ch16"]
+script = ExtResource("choice")
+text = "Release them into the pond."
+consequences = Array[ExtResource("cons")]([SubResource("cs13"), SubResource("cs14"), SubResource("cs15")])
+next = &"released"
+
+[sub_resource type="Resource" id="ch17"]
+script = ExtResource("choice")
+text = "Leave them."
+
+[sub_resource type="Resource" id="nd18"]
+script = ExtResource("node")
+id = &"magical_leak"
+text = "Someone has scooped a few of the glowing fish into the bucket. The water fizzes against your fingers."
+choices = Array[ExtResource("choice")]([SubResource("ch16"), SubResource("ch17")])
+
+[sub_resource type="Resource" id="cs19"]
+script = ExtResource("cons")
+kind = 0
+key = "world.well_fish"
+value = "false"
+
+[sub_resource type="Resource" id="cs20"]
+script = ExtResource("cons")
+kind = 0
+key = "world.pond_glows"
+
+[sub_resource type="Resource" id="cs21"]
+script = ExtResource("cons")
+kind = 0
+key = "event.glowing_fish.resolved"
+
+[sub_resource type="Resource" id="ch22"]
+script = ExtResource("choice")
+text = "Release them into the pond."
+consequences = Array[ExtResource("cons")]([SubResource("cs19"), SubResource("cs20"), SubResource("cs21")])
+next = &"released"
+
+[sub_resource type="Resource" id="ch23"]
+script = ExtResource("choice")
+text = "Leave them."
+
+[sub_resource type="Resource" id="nd24"]
+script = ExtResource("node")
+id = &"sleeping_spirit"
+text = "A few glowing fish drift round the bucket as if asleep. One opens an eye at you."
+choices = Array[ExtResource("choice")]([SubResource("ch22"), SubResource("ch23")])
+
+[sub_resource type="Resource" id="cs25"]
+script = ExtResource("cons")
+kind = 0
+key = "world.well_fish"
+value = "false"
+
+[sub_resource type="Resource" id="cs26"]
+script = ExtResource("cons")
+kind = 0
+key = "world.pond_glows"
+
+[sub_resource type="Resource" id="cs27"]
+script = ExtResource("cons")
+kind = 0
+key = "event.glowing_fish.resolved"
+
+[sub_resource type="Resource" id="ch28"]
+script = ExtResource("choice")
+text = "Release them into the pond."
+consequences = Array[ExtResource("cons")]([SubResource("cs25"), SubResource("cs26"), SubResource("cs27")])
+next = &"released"
+
+[sub_resource type="Resource" id="ch29"]
+script = ExtResource("choice")
+text = "Leave them."
+
+[sub_resource type="Resource" id="nd30"]
+script = ExtResource("node")
+id = &"world_anomaly"
+text = "The fish in the bucket swim in circles the wrong way round. None of them casts a shadow."
+choices = Array[ExtResource("choice")]([SubResource("ch28"), SubResource("ch29")])
+
+[sub_resource type="Resource" id="nd31"]
+script = ExtResource("node")
+id = &"released"
+text = "You tip the bucket into the pond. The glow spreads through the water and settles, and down in the well the last lights wink out, as if they followed."
+
+[sub_resource type="Resource" id="nd32"]
+script = ExtResource("node")
+id = &"after"
+text = "An empty bucket, still faintly warm."
+
+[sub_resource type="Resource" id="nd33"]
+script = ExtResource("node")
+id = &"empty"
+text = "An empty bucket."
+
+[resource]
+script = ExtResource("data")
+id = &"fish_bucket"
+entries = Array[ExtResource("choice")]([SubResource("ch3"), SubResource("ch6"), SubResource("ch9"), SubResource("ch11"), SubResource("ch12")])
+nodes = Array[ExtResource("node")]([SubResource("nd18"), SubResource("nd24"), SubResource("nd30"), SubResource("nd31"), SubResource("nd32"), SubResource("nd33")])

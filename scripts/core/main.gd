@@ -63,6 +63,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_reload_world()
 	elif event.is_action_pressed("debug_start_combat"):
 		_debug_start_combat()
+	elif event.is_action_pressed("debug_trigger_event"):
+		get_tree().call_group("event_host", "debug_evaluate")
 	elif event.is_action_pressed("debug_win_combat"):
 		for combat_area in _world.find_children("*", "CombatArea"):
 			if combat_area.controller:
@@ -74,7 +76,7 @@ func _process(_delta: float) -> void:
 		return
 	var rig := _rig()
 	var player: Player = _world.get_node("Player")
-	_debug_label.text = "FPS %d | internal %s (x%d) | post %s\ncam %s yaw %.0f° pitch %.0f° zoom %.1f | player %s\n[F2] pixel scale  [F3] post  [F4] play reveal  [F5] reload world  [F6] start fight  [F7] win fight  [RMB] orbit  [Q/E] rotate  [wheel] zoom (in = look at horizon)" % [
+	_debug_label.text = "FPS %d | internal %s (x%d) | post %s\ncam %s yaw %.0f° pitch %.0f° zoom %.1f | player %s\n[F2] pixel scale  [F3] post  [F4] play reveal  [F5] reload world  [F6] start fight  [F7] win fight  [F8] trigger event  [RMB] orbit  [Q/E] rotate  [wheel] zoom (in = look at horizon)" % [
 		Engine.get_frames_per_second(), _pixel_view.get_node("SubViewport").size, _pixel_view.stretch_shrink,
 		(_pixel_view.material as ShaderMaterial).get_shader_parameter("enabled"),
 		CameraController.State.keys()[rig.state], rad_to_deg(rig.rotation.y), rad_to_deg(rig.get_node("Pitch").rotation.x),
@@ -104,7 +106,7 @@ func _test_cinematic() -> void:
 
 
 ## `godot -- [--world=res://...tscn] --shot=C:/abs/shot.png [--overlay] [--flags=a,b] [--pad] [--interact] [--actions=name@frame,...] [--seed=N] [--then=x,y,z] [--pos=x,y,z] [--yaw=90] [--pitch=10 (offset)] [--zoom=14] [--scale=3] [--post=0] [--walk] [--reveal] [--frames=90]`
-## renders N frames, saves the PNG and quits. --interact sends a real "interact" input event at frame 45;
+## renders N frames, saves the PNG and quits. --seed also seeds the world event director. --interact sends a real "interact" input event at frame 45;
 ## --then reloads the world afterwards (leave + return) and puts the player at that position.
 func _handle_cli_screenshot(args: Dictionary) -> void:
 	if not args.has("shot"):
@@ -135,6 +137,7 @@ func _handle_cli_screenshot(args: Dictionary) -> void:
 	if args.has("seed"):
 		for combat_area in _world.find_children("*", "CombatArea"):
 			combat_area.rng_seed = int(args.seed)
+		GameState.set_flag(EventDirector.SEED, int(args.seed))
 	for key in (args.get("flags", "") as String).split(",", false):
 		GameState.set_flag(key)
 	_debug_label.visible = args.has("overlay")

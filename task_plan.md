@@ -13,7 +13,7 @@ Order from the master prompt §21. Definition of done: master prompt §23 / GDD 
 - [x] M7 Enemy AI CLOSED: data-selected Brain Dispatcher (ActorData.ai_brain) with melee-beast, ranged/utility and guardian demonstration brains; authored optional encounters (boars, Glimmer Midges at the forest-edge stones, Mossbound Guardian at the Broken Gate); guardian telegraph ring + move hint; rules/world tests and rendered midge/guardian smoke runs verified (2026-09-28).
 - [x] M8 Dialogue CLOSED: Resource dialogue data + validator, pure DialogueRunner (flag-only conditions, flag/event consequences), DialogueTrigger on Interactable, compact dialogue UI (keyboard/mouse/pad), Wenna the well-keeper with a visible world consequence; test_dialogue 33/33 + regression + rendered checks (2026-09-28).
 - [x] M9 Quest: The Missing Ring CLOSED: declarative QuestData + pure QuestTracker over flags; Hollis, midge hoard (learn from Wenna or find it; fight or trade), return/keep outcomes with visible consequences; quest HUD line; test_quest 48/48 + regression + rendered routes (2026-09-28).
-- [ ] M10 WorldEventDirector + Glowing Fish (variants)
+- [x] M10 WorldEventDirector CLOSED: pure seeded EventDirector over flags (region, prerequisites, ONCE/COOLDOWN, weighted event + variant, safe-moment opportunities), EventHost/EventRegion, The Glowing Fish (3 variants, investigate + release into the pond) and Night-berries (cooldown regrowth); F8 debug trigger; test_events 62/62 + regression + renders (2026-09-28).
 - [ ] M11 Guild upgrade: Repair the Common Room
 - [ ] M12 Save/load (versioned)
 - [ ] M13 Cinematic discovery at the overlook

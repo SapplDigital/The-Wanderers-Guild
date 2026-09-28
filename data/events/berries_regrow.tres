@@ -1,0 +1,52 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/events/data/event_data.gd" id="event"]
+[ext_resource type="Script" path="res://scripts/events/data/event_variant.gd" id="variant"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_condition.gd" id="cond"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_consequence.gd" id="cons"]
+
+[sub_resource type="Resource" id="cd1"]
+script = ExtResource("cond")
+flag = "world.berries_picked"
+test = 0
+
+[sub_resource type="Resource" id="cs2"]
+script = ExtResource("cons")
+kind = 0
+key = "berry_bush_0.used"
+value = "false"
+
+[sub_resource type="Resource" id="cs3"]
+script = ExtResource("cons")
+kind = 0
+key = "berry_bush_1.used"
+value = "false"
+
+[sub_resource type="Resource" id="cs4"]
+script = ExtResource("cons")
+kind = 0
+key = "berry_bush_2.used"
+value = "false"
+
+[sub_resource type="Resource" id="cs5"]
+script = ExtResource("cons")
+kind = 0
+key = "berry_bush_3.used"
+value = "false"
+
+[sub_resource type="Resource" id="cs6"]
+script = ExtResource("cons")
+kind = 0
+key = "world.berries_picked"
+value = "false"
+
+[resource]
+script = ExtResource("event")
+id = &"berries_regrow"
+region = &"forest"
+weight = 1
+conditions = Array[ExtResource("cond")]([SubResource("cd1")])
+repeat = 1
+cooldown = 3
+start = Array[ExtResource("cons")]([SubResource("cs2"), SubResource("cs3"), SubResource("cs4"), SubResource("cs5"), SubResource("cs6")])
+announcement = "The night-berry bushes have fruited again."

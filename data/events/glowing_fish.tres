@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="EventData" format=3]
+
+[ext_resource type="Script" path="res://scripts/events/data/event_data.gd" id="event"]
+[ext_resource type="Script" path="res://scripts/events/data/event_variant.gd" id="variant"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_condition.gd" id="cond"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_consequence.gd" id="cons"]
+
+[sub_resource type="Resource" id="cd1"]
+script = ExtResource("cond")
+flag = "discovered.abandoned_camp"
+test = 0
+
+[sub_resource type="Resource" id="cs2"]
+script = ExtResource("cons")
+kind = 0
+key = "world.well_fish"
+
+[sub_resource type="Resource" id="va3"]
+script = ExtResource("variant")
+id = &"magical_leak"
+weight = 1
+
+[sub_resource type="Resource" id="va4"]
+script = ExtResource("variant")
+id = &"sleeping_spirit"
+weight = 1
+
+[sub_resource type="Resource" id="cd5"]
+script = ExtResource("cond")
+flag = "world.shrine_awakened"
+test = 0
+
+[sub_resource type="Resource" id="va6"]
+script = ExtResource("variant")
+id = &"world_anomaly"
+weight = 1
+conditions = Array[ExtResource("cond")]([SubResource("cd5")])
+
+[resource]
+script = ExtResource("event")
+id = &"glowing_fish"
+region = &"village"
+weight = 1
+conditions = Array[ExtResource("cond")]([SubResource("cd1")])
+repeat = 0
+start = Array[ExtResource("cons")]([SubResource("cs2")])
+announcement = "Something is glowing in the village well."
+variants = Array[ExtResource("variant")]([SubResource("va3"), SubResource("va4"), SubResource("va6")])
