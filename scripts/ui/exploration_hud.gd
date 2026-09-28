@@ -43,6 +43,7 @@ func bind(world: Node) -> void:
 	_player.health_changed.connect(_on_health_changed)
 	_player.get_node("Interactor").used.connect(func(_t: Interactable) -> void: _pulse_prompt())
 	_on_health_changed(_player.health, _player.max_health)
+	_refresh_quests(false) # flags may have been replaced (load): rebuild the cache without announcing
 	# A new world means we're somewhere else: drop leftover place names and messages.
 	for tw in [_location_tween, _message_tween]:
 		if tw:

@@ -3,6 +3,10 @@ extends Node
 ## and the debug keys. Debug input is ignored in release builds.
 
 const PIXEL_SCALES: Array[int] = [1, 2, 3, 4, 5, 6]
+const MAIN_WORLD := "res://scenes/world/slice_region.tscn" ## the only world that saves and loads
+
+var save_path := SaveGame.PATH
+var _autosave := true ## on quit; off for scripted shot runs
 
 @onready var _pixel_view: SubViewportContainer = $PixelView
 @onready var _world: Node3D = $PixelView/SubViewport/World
@@ -15,9 +19,18 @@ func _ready() -> void:
 	# Uniforms left at their shader default read back as null; make the toggle state explicit.
 	(_pixel_view.material as ShaderMaterial).set_shader_parameter("enabled", true)
 	var args := _cli_args()
-	if args.has("world") and OS.is_debug_build():
-		_swap_world(args.world)
+	if OS.is_debug_build():
+		save_path = args.get("save-file", save_path)
+		if args.has("world"):
+			_swap_world(args.world)
 	_hud.bind(_world)
+	# Continue from the save on launch. Shot runs, test worlds and tests (main isn't the current
+	# scene there) never pick up a developer's save unless asked with --load.
+	if args.has("load") and OS.is_debug_build():
+		load_game()
+	elif get_tree().current_scene == self and not (args.has("fresh") or args.has("shot") or args.has("world")):
+		load_game(false)
+	_autosave = not args.has("shot")
 	_handle_cli_screenshot(args)
 
 
@@ -30,14 +43,23 @@ func _cli_args() -> Dictionary:
 	return args
 
 
-func _swap_world(path: String) -> void:
+## `player_at`/`health` (from a save) are applied before the world enters the tree, so the first
+## physics step already happens there: no overlap at the default spawn (no false region entry,
+## discovery or trigger) and interiors detect the player straight away. The camera rig snaps to
+## the player in its own _ready.
+func _swap_world(path: String, player_at: Variant = null, health := 0) -> void:
 	var viewport := _world.get_parent()
 	_world.free()
 	_world = (load(path) as PackedScene).instantiate()
 	_world.name = "World"
+	var player: Player = _world.get_node("Player")
+	if player_at != null:
+		player.position = player_at
+	if health > 0:
+		player.health = health
+	_hud.bind(_world) # before add_child: the quest cache matches the (loaded) flags before anything can write one
 	viewport.add_child(_world)
 	viewport.move_child(_world, 0) # keep the HUD drawn on top
-	_hud.bind(_world)
 
 
 ## Debug stand-in for leaving and coming back: rebuilds the world from its scene.
@@ -46,10 +68,44 @@ func _reload_world() -> void:
 	_swap_world(_world.scene_file_path)
 
 
+## Saves GameState.flags + the player (see SaveGame). Refused outside the main world and while
+## the player is busy (combat, dialogue, cinematic: the same rule as EventHost.is_safe).
+func save_game() -> bool:
+	var player: Player = _world.get_node("Player")
+	if _world.scene_file_path != MAIN_WORLD or not player.input_enabled or _rig().state == CameraController.State.CINEMATIC:
+		return false
+	return SaveGame.write(save_path, GameState.flags, player.global_position, player.health) == OK
+
+
+## Replaces the flags wholesale (no flag_changed: the world is rebuilt from them anyway) and
+## rebuilds the main world with the player where they saved. A missing or bad save changes
+## nothing; `report_missing` = say so when there is no save at all.
+func load_game(report_missing := true) -> bool:
+	var data := SaveGame.read(save_path)
+	if not data.ok:
+		if data.error != SaveGame.NO_SAVE or report_missing:
+			_hud.show_message("No save to load." if data.error == SaveGame.NO_SAVE else data.error)
+		return false
+	GameState.flags = data.flags
+	_swap_world(MAIN_WORLD, data.position, data.health)
+	return true
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST and _autosave:
+		save_game() # unsafe moment: the previous save stays
+
+
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("quicksave"):
+		_hud.show_message("Saved." if save_game() else "Can't save right now.")
 	if not OS.is_debug_build():
 		return
-	if event.is_action_pressed("debug_toggle_overlay"):
+	if event.is_action_pressed("debug_quickload"):
+		var player: Player = _world.get_node("Player")
+		if player.input_enabled and not _rig().is_cinematic: # never tear down a fight or conversation
+			load_game()
+	elif event.is_action_pressed("debug_toggle_overlay"):
 		_debug_label.visible = not _debug_label.visible
 	elif event.is_action_pressed("debug_cycle_pixel_scale"):
 		var i := PIXEL_SCALES.find(_pixel_view.stretch_shrink)
@@ -76,7 +132,7 @@ func _process(_delta: float) -> void:
 		return
 	var rig := _rig()
 	var player: Player = _world.get_node("Player")
-	_debug_label.text = "FPS %d | internal %s (x%d) | post %s\ncam %s yaw %.0f° pitch %.0f° zoom %.1f | player %s\n[F2] pixel scale  [F3] post  [F4] play reveal  [F5] reload world  [F6] start fight  [F7] win fight  [F8] trigger event  [RMB] orbit  [Q/E] rotate  [wheel] zoom (in = look at horizon)" % [
+	_debug_label.text = "FPS %d | internal %s (x%d) | post %s\ncam %s yaw %.0f° pitch %.0f° zoom %.1f | player %s\n[F2] pixel scale  [F3] post  [F4] play reveal  [F5] reload world  [F6] start fight  [F7] win fight  [F8] trigger event  [F9] save  [F10] load  [RMB] orbit  [Q/E] rotate  [wheel] zoom (in = look at horizon)" % [
 		Engine.get_frames_per_second(), _pixel_view.get_node("SubViewport").size, _pixel_view.stretch_shrink,
 		(_pixel_view.material as ShaderMaterial).get_shader_parameter("enabled"),
 		CameraController.State.keys()[rig.state], rad_to_deg(rig.rotation.y), rad_to_deg(rig.get_node("Pitch").rotation.x),
@@ -105,7 +161,7 @@ func _test_cinematic() -> void:
 		reveals[0].play(_world.get_node("Player"))
 
 
-## `godot -- [--world=res://...tscn] --shot=C:/abs/shot.png [--overlay] [--flags=a,b] [--pad] [--interact] [--actions=name@frame,...] [--seed=N] [--then=x,y,z] [--pos=x,y,z] [--yaw=90] [--pitch=10 (offset)] [--zoom=14] [--scale=3] [--post=0] [--walk] [--reveal] [--frames=90]`
+## `godot -- [--world=res://...tscn] --shot=C:/abs/shot.png [--save-file=C:/abs/save.cfg] [--load] [--overlay] [--flags=a,b] [--pad] [--interact] [--actions=name@frame,...] [--seed=N] [--then=x,y,z] [--pos=x,y,z] [--yaw=90] [--pitch=10 (offset)] [--zoom=14] [--scale=3] [--post=0] [--walk] [--reveal] [--frames=90]`
 ## renders N frames, saves the PNG and quits. --seed also seeds the world event director. --interact sends a real "interact" input event at frame 45;
 ## --then reloads the world afterwards (leave + return) and puts the player at that position.
 func _handle_cli_screenshot(args: Dictionary) -> void:
