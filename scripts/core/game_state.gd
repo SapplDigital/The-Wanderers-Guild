@@ -5,7 +5,8 @@ extends Node
 ##   discovered.<location>     places the player has found
 ##   <object_id>.used          interactables that were used
 ##   world.<fact>              persistent world changes (e.g. world.shrine_awakened)
-##   npc.<id>.<fact>, quest.<id>.<fact>, event.<id>.<fact>   (later milestones)
+##   npc.<id>.<fact>, quest.<id>.<fact>, event.<id>.<fact>
+##   guild.<room>.<fact>      guild upgrades (e.g. guild.common_room.repaired)
 ## ponytail: untyped string keys, no schema; add validation when data files start writing keys.
 
 signal flag_changed(key: String, value: Variant)

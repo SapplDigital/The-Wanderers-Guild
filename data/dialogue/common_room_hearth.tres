@@ -1,0 +1,142 @@
+[gd_resource type="Resource" script_class="DialogueData" format=3]
+
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_data.gd" id="data"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_node.gd" id="node"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_choice.gd" id="choice"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_condition.gd" id="cond"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_consequence.gd" id="cons"]
+
+[sub_resource type="Resource" id="cd1"]
+script = ExtResource("cond")
+flag = "guild.common_room.repaired"
+test = 0
+
+[sub_resource type="Resource" id="ch2"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd1")])
+next = &"warm"
+
+[sub_resource type="Resource" id="cd3"]
+script = ExtResource("cond")
+flag = "quest.common_room.has_timber"
+test = 0
+
+[sub_resource type="Resource" id="cd4"]
+script = ExtResource("cond")
+flag = "quest.common_room.has_ember"
+test = 0
+
+[sub_resource type="Resource" id="cs5"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.common_room.accepted"
+
+[sub_resource type="Resource" id="ch6"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd3"), SubResource("cd4")])
+consequences = Array[ExtResource("cons")]([SubResource("cs5")])
+next = &"ready"
+
+[sub_resource type="Resource" id="cs7"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.common_room.accepted"
+
+[sub_resource type="Resource" id="ch8"]
+script = ExtResource("choice")
+consequences = Array[ExtResource("cons")]([SubResource("cs7")])
+next = &"cold"
+
+[sub_resource type="Resource" id="ch9"]
+script = ExtResource("choice")
+text = "What would it take?"
+next = &"needs"
+
+[sub_resource type="Resource" id="ch10"]
+script = ExtResource("choice")
+text = "Leave it for now."
+
+[sub_resource type="Resource" id="nd11"]
+script = ExtResource("node")
+id = &"cold"
+text = "The hearth is cold and choked with soot. The table has lost a leg, and the shutters bang in the wind. Nobody would pay to sit in here."
+choices = Array[ExtResource("choice")]([SubResource("ch9"), SubResource("ch10")])
+
+[sub_resource type="Resource" id="cd12"]
+script = ExtResource("cond")
+flag = "quest.common_room.has_timber"
+test = 1
+
+[sub_resource type="Resource" id="ch13"]
+script = ExtResource("choice")
+text = "Where would I find timber?"
+conditions = Array[ExtResource("cond")]([SubResource("cd12")])
+next = &"timber_hint"
+
+[sub_resource type="Resource" id="cd14"]
+script = ExtResource("cond")
+flag = "quest.common_room.has_ember"
+test = 1
+
+[sub_resource type="Resource" id="ch15"]
+script = ExtResource("choice")
+text = "And a live coal?"
+conditions = Array[ExtResource("cond")]([SubResource("cd14")])
+next = &"ember_hint"
+
+[sub_resource type="Resource" id="ch16"]
+script = ExtResource("choice")
+text = "Leave it for now."
+
+[sub_resource type="Resource" id="nd17"]
+script = ExtResource("node")
+id = &"needs"
+text = "Timber for the table and the shutters. And a live coal: this chimney hasn't drawn in years. It wants a flame that's already willing."
+choices = Array[ExtResource("choice")]([SubResource("ch13"), SubResource("ch15"), SubResource("ch16")])
+
+[sub_resource type="Resource" id="nd18"]
+script = ExtResource("node")
+id = &"timber_hint"
+text = "Someone left a camp in the forest in a hurry. Campers carry boards, and they don't carry them home."
+
+[sub_resource type="Resource" id="nd19"]
+script = ExtResource("node")
+id = &"ember_hint"
+text = "Wenna at the well keeps her stove going day and night. She might spare a coal."
+
+[sub_resource type="Resource" id="cs20"]
+script = ExtResource("cons")
+kind = 0
+key = "guild.common_room.repaired"
+
+[sub_resource type="Resource" id="ch21"]
+script = ExtResource("choice")
+text = "Repair the common room."
+consequences = Array[ExtResource("cons")]([SubResource("cs20")])
+next = &"repaired_now"
+
+[sub_resource type="Resource" id="ch22"]
+script = ExtResource("choice")
+text = "Not yet."
+
+[sub_resource type="Resource" id="nd23"]
+script = ExtResource("node")
+id = &"ready"
+text = "Dry boards from the camp, and Wenna's coal banked in ash. Enough to make a start."
+choices = Array[ExtResource("choice")]([SubResource("ch21"), SubResource("ch22")])
+
+[sub_resource type="Resource" id="nd24"]
+script = ExtResource("node")
+id = &"repaired_now"
+text = "You work until dark. The table stands, the shutters close, and the coal catches. Firelight fills the room."
+
+[sub_resource type="Resource" id="nd25"]
+script = ExtResource("node")
+id = &"warm"
+text = "The fire crackles. The room smells of pine smoke and somebody else's supper."
+
+[resource]
+script = ExtResource("data")
+id = &"common_room_hearth"
+entries = Array[ExtResource("choice")]([SubResource("ch2"), SubResource("ch6"), SubResource("ch8")])
+nodes = Array[ExtResource("node")]([SubResource("nd11"), SubResource("nd17"), SubResource("nd18"), SubResource("nd19"), SubResource("nd23"), SubResource("nd24"), SubResource("nd25")])

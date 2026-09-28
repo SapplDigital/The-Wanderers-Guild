@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/props/tree.tscn" id="tree"]
 [ext_resource type="PackedScene" path="res://scenes/world/props/rock.tscn" id="rock"]
 [ext_resource type="PackedScene" path="res://scenes/world/props/house.tscn" id="house"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/guild_hall.tscn" id="guild_hall"]
 [ext_resource type="PackedScene" path="res://scenes/world/props/lantern.tscn" id="lantern"]
 [ext_resource type="PackedScene" path="res://scenes/world/props/well.tscn" id="well"]
 [ext_resource type="PackedScene" path="res://scenes/world/props/notice_board.tscn" id="board"]
@@ -260,6 +261,10 @@ size = Vector3(4.00, 1.00, 3.00)
 [sub_resource type="BoxShape3D" id="stream_surface"]
 size = Vector3(1.60, 1.00, 12.00)
 
+[sub_resource type="BoxMesh" id="camp_board"]
+material = ExtResource("wood")
+size = Vector3(1.8, 0.07, 0.3)
+
 [sub_resource type="SphereShape3D" id="amb_combat_zone"]
 radius = 10.0
 
@@ -298,13 +303,14 @@ mesh = SubResource("plaza_mesh")
 
 [node name="Well" parent="Village" instance=ExtResource("well")]
 
-[node name="GuildHall" parent="Village" instance=ExtResource("house")]
-position = Vector3(-15, 0, 0)
-rotation_degrees = Vector3(0, 90, 0)
-scale = Vector3(1.5, 1.5, 1.5)
+[node name="GuildHall" parent="Village" instance=ExtResource("guild_hall")]
+position = Vector3(-17, 0, 0)
+
+[node name="Interior" parent="Village/GuildHall" node_paths=PackedStringArray("camera_rig")]
+camera_rig = NodePath("../../../CameraRig")
 
 [node name="GuildDoor" type="Marker3D" parent="Village"]
-position = Vector3(-10.5, 0, 1.2)
+position = Vector3(-12, 0, 0)
 
 [node name="NoticeBoard" parent="Village" instance=ExtResource("board")]
 position = Vector3(-8, 0, 5)
@@ -2483,6 +2489,36 @@ message = "A damp journal. Last entry: 'The light between the trees hums when I 
 message_repeat = "The last entry ends mid-word. Outside the camp, a line of stones leads deeper into the trees."
 
 [node name="Reach" type="CollisionShape3D" parent="Forest/AbandonedCamp/ReadJournal"]
+shape = SubResource("reach_s")
+
+[node name="Boards" type="Node3D" parent="Forest/AbandonedCamp"]
+script = ExtResource("toggle")
+flag = "camp_boards.used"
+visible_when_set = false
+
+[node name="Board0" type="MeshInstance3D" parent="Forest/AbandonedCamp/Boards"]
+transform = Transform3D(0.94, 0, 0.342, 0, 1, 0, -0.342, 0, 0.94, -12.6, 0.04, -42.9)
+mesh = SubResource("camp_board")
+
+[node name="Board1" type="MeshInstance3D" parent="Forest/AbandonedCamp/Boards"]
+transform = Transform3D(0.985, 0, 0.174, 0, 1, 0, -0.174, 0, 0.985, -12.55, 0.11, -42.75)
+mesh = SubResource("camp_board")
+
+[node name="Board2" type="MeshInstance3D" parent="Forest/AbandonedCamp/Boards"]
+transform = Transform3D(0.906, 0, 0.423, 0, 1, 0, -0.423, 0, 0.906, -12.65, 0.18, -42.95)
+mesh = SubResource("camp_board")
+
+[node name="SalvageBoards" type="Area3D" parent="Forest/AbandonedCamp"]
+position = Vector3(-12.6, 0, -42.9)
+script = ExtResource("interactable")
+verb = "Salvage boards"
+state_id = "camp_boards"
+once = true
+sets_flag = "quest.common_room.has_timber"
+prompt_height = 0.7
+message = "Good boards, still dry under the bedroll. Enough to mend a table and a pair of shutters."
+
+[node name="Reach" type="CollisionShape3D" parent="Forest/AbandonedCamp/SalvageBoards"]
 shape = SubResource("reach_s")
 
 [node name="ExamineLantern" type="Area3D" parent="Forest/AbandonedCamp"]

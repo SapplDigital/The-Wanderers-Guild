@@ -170,12 +170,40 @@ next = &"midge_trade"
 script = ExtResource("choice")
 text = "Goodbye."
 
+[sub_resource type="Resource" id="cd107"]
+script = ExtResource("cond")
+flag = "quest.common_room.accepted"
+test = 0
+
+[sub_resource type="Resource" id="cd108"]
+script = ExtResource("cond")
+flag = "quest.common_room.has_ember"
+test = 1
+
+[sub_resource type="Resource" id="cs109"]
+script = ExtResource("cons")
+kind = 0
+key = "quest.common_room.has_ember"
+
+[sub_resource type="Resource" id="ch110"]
+script = ExtResource("choice")
+text = "The guild hearth needs a live coal."
+conditions = Array[ExtResource("cond")]([SubResource("cd107"), SubResource("cd108")])
+consequences = Array[ExtResource("cons")]([SubResource("cs109")])
+next = &"ember"
+
+[sub_resource type="Resource" id="nd111"]
+script = ExtResource("node")
+id = &"ember"
+speaker = "Wenna"
+text = "Somebody's finally lighting that place? Here, from my stove, banked in ash. Keep it out of the wet and it'll last till you're home."
+
 [sub_resource type="Resource" id="nd32"]
 script = ExtResource("node")
 id = &"first"
 speaker = "Wenna"
 text = "A new face. Mind the water, traveller. It's been answering back."
-choices = Array[ExtResource("choice")]([SubResource("ch11"), SubResource("ch13"), SubResource("ch16"), SubResource("ch19"), SubResource("ch22"), SubResource("ch26"), SubResource("ch30"), SubResource("ch31")])
+choices = Array[ExtResource("choice")]([SubResource("ch11"), SubResource("ch13"), SubResource("ch16"), SubResource("ch19"), SubResource("ch22"), SubResource("ch26"), SubResource("ch30"), SubResource("ch110"), SubResource("ch31")])
 
 [sub_resource type="Resource" id="cs33"]
 script = ExtResource("cons")
@@ -373,7 +401,7 @@ script = ExtResource("node")
 id = &"again"
 speaker = "Wenna"
 text = "Back again. The water's still running late."
-choices = Array[ExtResource("choice")]([SubResource("ch46"), SubResource("ch48"), SubResource("ch51"), SubResource("ch54"), SubResource("ch57"), SubResource("ch61"), SubResource("ch65"), SubResource("ch66"), SubResource("ch67")])
+choices = Array[ExtResource("choice")]([SubResource("ch46"), SubResource("ch48"), SubResource("ch51"), SubResource("ch54"), SubResource("ch57"), SubResource("ch61"), SubResource("ch65"), SubResource("ch110"), SubResource("ch66"), SubResource("ch67")])
 
 [sub_resource type="Resource" id="cd69"]
 script = ExtResource("cond")
@@ -493,7 +521,7 @@ script = ExtResource("node")
 id = &"lamp_thanks"
 speaker = "Wenna"
 text = "The lamp's still burning. I sleep better for it."
-choices = Array[ExtResource("choice")]([SubResource("ch70"), SubResource("ch73"), SubResource("ch76"), SubResource("ch79"), SubResource("ch83"), SubResource("ch87"), SubResource("ch88"), SubResource("ch89")])
+choices = Array[ExtResource("choice")]([SubResource("ch70"), SubResource("ch73"), SubResource("ch76"), SubResource("ch79"), SubResource("ch83"), SubResource("ch87"), SubResource("ch110"), SubResource("ch88"), SubResource("ch89")])
 
 [sub_resource type="Resource" id="nd91"]
 script = ExtResource("node")
@@ -589,4 +617,4 @@ text = "Hollis has pinned a notice about a lost ring. You wouldn't know anything
 script = ExtResource("data")
 id = &"well_keeper"
 entries = Array[ExtResource("choice")]([SubResource("ch3"), SubResource("ch7"), SubResource("ch9"), SubResource("ch10")])
-nodes = Array[ExtResource("node")]([SubResource("nd32"), SubResource("nd37"), SubResource("nd38"), SubResource("nd43"), SubResource("nd44"), SubResource("nd68"), SubResource("nd90"), SubResource("nd91"), SubResource("nd92"), SubResource("nd93"), SubResource("nd94"), SubResource("nd99"), SubResource("nd105"), SubResource("nd106")])
+nodes = Array[ExtResource("node")]([SubResource("nd32"), SubResource("nd37"), SubResource("nd38"), SubResource("nd43"), SubResource("nd44"), SubResource("nd68"), SubResource("nd90"), SubResource("nd91"), SubResource("nd92"), SubResource("nd93"), SubResource("nd94"), SubResource("nd99"), SubResource("nd105"), SubResource("nd106"), SubResource("nd111")])

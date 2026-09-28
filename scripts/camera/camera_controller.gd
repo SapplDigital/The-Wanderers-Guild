@@ -40,6 +40,7 @@ enum State { NORMAL, LOOK, CINEMATIC }
 @onready var _arm: SpringArm3D = $Pitch/SpringArm3D
 @onready var _anchor: Node3D = $Pitch/SpringArm3D/Anchor
 @onready var _base_fov := camera.fov
+@onready var _arm_mask := _arm.collision_mask
 
 var _yaw_goal := 0.0
 var _zoom_goal := 0.0
@@ -72,6 +73,12 @@ func _ready() -> void:
 	if target:
 		global_position = target.global_position
 	_apply_rail()
+
+
+## Interiors switch the spring arm's collision off while the player is inside: the cut-away
+## walls and roof would otherwise pull the camera down into the room.
+func set_collision_enabled(on: bool) -> void:
+	_arm.collision_mask = _arm_mask if on else 0
 
 
 func set_zoom(distance: float) -> void:

@@ -1,0 +1,421 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://art/materials/wood.tres" id="wood"]
+[ext_resource type="Material" path="res://art/materials/roof.tres" id="roof"]
+[ext_resource type="Material" path="res://art/materials/stone.tres" id="stone"]
+[ext_resource type="Material" path="res://art/materials/lantern_glow.tres" id="glow"]
+[ext_resource type="Material" path="res://art/materials/cloak.tres" id="cloak"]
+[ext_resource type="Script" path="res://scripts/world/interior_zone.gd" id="interior"]
+[ext_resource type="Script" path="res://scripts/world/state_toggle.gd" id="toggle"]
+[ext_resource type="Script" path="res://scripts/world/surface_area.gd" id="surface"]
+[ext_resource type="Script" path="res://scripts/interaction/interactable.gd" id="interactable"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_trigger.gd" id="trigger"]
+[ext_resource type="Resource" path="res://data/dialogue/common_room_hearth.tres" id="dlg_hearth"]
+[ext_resource type="Resource" path="res://data/dialogue/lodger.tres" id="dlg_lodger"]
+[ext_resource type="PackedScene" path="res://scenes/npcs/villager.tscn" id="villager"]
+
+[sub_resource type="BoxMesh" id="floor"]
+material = ExtResource("wood")
+size = Vector3(9, 0.06, 8)
+
+[sub_resource type="BoxMesh" id="wall_ns_low"]
+material = ExtResource("wood")
+size = Vector3(9.3, 0.9, 0.3)
+
+[sub_resource type="BoxMesh" id="wall_ns_up"]
+material = ExtResource("wood")
+size = Vector3(9.3, 2.3, 0.3)
+
+[sub_resource type="BoxMesh" id="wall_w_low"]
+material = ExtResource("wood")
+size = Vector3(0.3, 0.9, 8)
+
+[sub_resource type="BoxMesh" id="wall_w_up"]
+material = ExtResource("wood")
+size = Vector3(0.3, 2.3, 8)
+
+[sub_resource type="BoxMesh" id="wall_e_low"]
+material = ExtResource("wood")
+size = Vector3(0.3, 0.9, 3.1)
+
+[sub_resource type="BoxMesh" id="wall_e_up"]
+material = ExtResource("wood")
+size = Vector3(0.3, 2.3, 3.1)
+
+[sub_resource type="BoxMesh" id="lintel"]
+material = ExtResource("wood")
+size = Vector3(0.3, 0.8, 1.8)
+
+[sub_resource type="PrismMesh" id="roof"]
+material = ExtResource("roof")
+size = Vector3(10.2, 2.4, 9.2)
+
+[sub_resource type="BoxMesh" id="chimney"]
+material = ExtResource("stone")
+size = Vector3(0.9, 2.8, 0.9)
+
+[sub_resource type="BoxMesh" id="sign"]
+material = ExtResource("wood")
+size = Vector3(0.08, 0.5, 1.4)
+
+[sub_resource type="BoxMesh" id="hearth"]
+material = ExtResource("stone")
+size = Vector3(2.2, 1.3, 0.7)
+
+[sub_resource type="BoxMesh" id="mantle"]
+material = ExtResource("wood")
+size = Vector3(2.6, 0.15, 0.9)
+
+[sub_resource type="BoxMesh" id="soot"]
+material = ExtResource("stone")
+size = Vector3(1.3, 0.12, 0.6)
+
+[sub_resource type="BoxMesh" id="fire"]
+material = ExtResource("glow")
+size = Vector3(1.0, 0.4, 0.3)
+
+[sub_resource type="BoxMesh" id="window_e"]
+material = ExtResource("glow")
+size = Vector3(0.05, 0.8, 1.0)
+
+[sub_resource type="BoxMesh" id="window_s"]
+material = ExtResource("glow")
+size = Vector3(1.0, 0.8, 0.05)
+
+[sub_resource type="BoxMesh" id="shutter_e"]
+material = ExtResource("wood")
+size = Vector3(0.06, 0.9, 0.55)
+
+[sub_resource type="BoxMesh" id="shutter_s"]
+material = ExtResource("wood")
+size = Vector3(0.55, 0.9, 0.06)
+
+[sub_resource type="BoxMesh" id="table_top"]
+material = ExtResource("wood")
+size = Vector3(2.2, 0.1, 1.1)
+
+[sub_resource type="BoxMesh" id="table_leg"]
+material = ExtResource("wood")
+size = Vector3(0.12, 0.75, 0.12)
+
+[sub_resource type="BoxMesh" id="bench"]
+material = ExtResource("wood")
+size = Vector3(1.8, 0.45, 0.35)
+
+[sub_resource type="BoxMesh" id="plank"]
+material = ExtResource("wood")
+size = Vector3(1.6, 0.06, 0.25)
+
+[sub_resource type="BoxMesh" id="lamp"]
+material = ExtResource("glow")
+size = Vector3(0.2, 0.25, 0.2)
+
+[sub_resource type="BoxShape3D" id="col_ns"]
+size = Vector3(9.3, 3.2, 0.3)
+
+[sub_resource type="BoxShape3D" id="col_w"]
+size = Vector3(0.3, 3.2, 8)
+
+[sub_resource type="BoxShape3D" id="col_e"]
+size = Vector3(0.3, 3.2, 3.1)
+
+[sub_resource type="BoxShape3D" id="col_lintel"]
+size = Vector3(0.3, 0.8, 1.8)
+
+[sub_resource type="ConvexPolygonShape3D" id="col_roof"]
+points = PackedVector3Array(-5.1, -1.2, -4.6, 5.1, -1.2, -4.6, 0, 1.2, -4.6, -5.1, -1.2, 4.6, 5.1, -1.2, 4.6, 0, 1.2, 4.6)
+
+[sub_resource type="BoxShape3D" id="col_hearth"]
+size = Vector3(2.2, 1.3, 0.7)
+
+[sub_resource type="BoxShape3D" id="col_table"]
+size = Vector3(2.2, 0.85, 1.1)
+
+[sub_resource type="BoxShape3D" id="room"]
+size = Vector3(8.6, 3, 7.6)
+
+[sub_resource type="BoxShape3D" id="floor_surface"]
+size = Vector3(9, 1, 8)
+
+[sub_resource type="SphereShape3D" id="reach"]
+radius = 1.2
+
+[node name="GuildHall" type="StaticBody3D"]
+
+[node name="ColNorth" type="CollisionShape3D" parent="."]
+position = Vector3(0, 1.6, -4)
+shape = SubResource("col_ns")
+
+[node name="ColSouth" type="CollisionShape3D" parent="."]
+position = Vector3(0, 1.6, 4)
+shape = SubResource("col_ns")
+
+[node name="ColWest" type="CollisionShape3D" parent="."]
+position = Vector3(-4.5, 1.6, 0)
+shape = SubResource("col_w")
+
+[node name="ColEastN" type="CollisionShape3D" parent="."]
+position = Vector3(4.5, 1.6, -2.45)
+shape = SubResource("col_e")
+
+[node name="ColEastS" type="CollisionShape3D" parent="."]
+position = Vector3(4.5, 1.6, 2.45)
+shape = SubResource("col_e")
+
+[node name="ColLintel" type="CollisionShape3D" parent="."]
+position = Vector3(4.5, 2.8, 0)
+shape = SubResource("col_lintel")
+
+[node name="ColRoof" type="CollisionShape3D" parent="."]
+position = Vector3(0, 4.4, 0)
+shape = SubResource("col_roof")
+
+[node name="ColHearth" type="CollisionShape3D" parent="."]
+position = Vector3(-1.5, 0.65, -3.5)
+shape = SubResource("col_hearth")
+
+[node name="Floor" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.03, 0)
+mesh = SubResource("floor")
+
+[node name="WallNorthLow" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.45, -4)
+mesh = SubResource("wall_ns_low")
+
+[node name="WallSouthLow" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.45, 4)
+mesh = SubResource("wall_ns_low")
+
+[node name="WallWestLow" type="MeshInstance3D" parent="."]
+position = Vector3(-4.5, 0.45, 0)
+mesh = SubResource("wall_w_low")
+
+[node name="WallEastLowN" type="MeshInstance3D" parent="."]
+position = Vector3(4.5, 0.45, -2.45)
+mesh = SubResource("wall_e_low")
+
+[node name="WallEastLowS" type="MeshInstance3D" parent="."]
+position = Vector3(4.5, 0.45, 2.45)
+mesh = SubResource("wall_e_low")
+
+[node name="Hearth" type="MeshInstance3D" parent="."]
+position = Vector3(-1.5, 0.65, -3.5)
+mesh = SubResource("hearth")
+
+[node name="Mantle" type="MeshInstance3D" parent="."]
+position = Vector3(-1.5, 1.35, -3.45)
+mesh = SubResource("mantle")
+
+[node name="Cutaway" type="Node3D" parent="."]
+
+[node name="WallNorthUp" type="MeshInstance3D" parent="Cutaway"]
+position = Vector3(0, 2.05, -4)
+mesh = SubResource("wall_ns_up")
+
+[node name="WallSouthUp" type="MeshInstance3D" parent="Cutaway"]
+position = Vector3(0, 2.05, 4)
+mesh = SubResource("wall_ns_up")
+
+[node name="WallWestUp" type="MeshInstance3D" parent="Cutaway"]
+position = Vector3(-4.5, 2.05, 0)
+mesh = SubResource("wall_w_up")
+
+[node name="WallEastUpN" type="MeshInstance3D" parent="Cutaway"]
+position = Vector3(4.5, 2.05, -2.45)
+mesh = SubResource("wall_e_up")
+
+[node name="WallEastUpS" type="MeshInstance3D" parent="Cutaway"]
+position = Vector3(4.5, 2.05, 2.45)
+mesh = SubResource("wall_e_up")
+
+[node name="Lintel" type="MeshInstance3D" parent="Cutaway"]
+position = Vector3(4.5, 2.8, 0)
+mesh = SubResource("lintel")
+
+[node name="Sign" type="MeshInstance3D" parent="Cutaway"]
+position = Vector3(4.72, 2.85, 0)
+mesh = SubResource("sign")
+
+[node name="Roof" type="MeshInstance3D" parent="Cutaway"]
+position = Vector3(0, 4.4, 0)
+mesh = SubResource("roof")
+
+[node name="Chimney" type="MeshInstance3D" parent="Cutaway"]
+position = Vector3(-1.5, 4.6, -4)
+mesh = SubResource("chimney")
+
+[node name="Shutters" type="Node3D" parent="Cutaway"]
+script = ExtResource("toggle")
+flag = "guild.common_room.repaired"
+visible_when_set = false
+
+[node name="EastHanging" type="MeshInstance3D" parent="Cutaway/Shutters"]
+transform = Transform3D(0.906, 0, 0.423, 0, 1, 0, -0.423, 0, 0.906, 4.75, 1.55, 3.25)
+mesh = SubResource("shutter_e")
+
+[node name="SouthHanging" type="MeshInstance3D" parent="Cutaway/Shutters"]
+transform = Transform3D(0.906, 0.423, 0, -0.423, 0.906, 0, 0, 0, 1, 1.0, 1.5, 4.22)
+mesh = SubResource("shutter_s")
+
+[node name="LitWindows" type="Node3D" parent="Cutaway"]
+script = ExtResource("toggle")
+flag = "guild.common_room.repaired"
+
+[node name="East" type="MeshInstance3D" parent="Cutaway/LitWindows"]
+position = Vector3(4.67, 1.7, 2.6)
+mesh = SubResource("window_e")
+
+[node name="South" type="MeshInstance3D" parent="Cutaway/LitWindows"]
+position = Vector3(1.5, 1.7, 4.17)
+mesh = SubResource("window_s")
+
+[node name="EastLight" type="OmniLight3D" parent="Cutaway/LitWindows"]
+position = Vector3(5.6, 1.8, 2.6)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 6.0
+
+[node name="SouthLight" type="OmniLight3D" parent="Cutaway/LitWindows"]
+position = Vector3(1.5, 1.8, 5.0)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 6.0
+
+[node name="Damaged" type="Node3D" parent="."]
+script = ExtResource("toggle")
+flag = "guild.common_room.repaired"
+visible_when_set = false
+
+[node name="Soot" type="MeshInstance3D" parent="Damaged"]
+position = Vector3(-1.5, 0.09, -2.95)
+mesh = SubResource("soot")
+
+[node name="BrokenTable" type="MeshInstance3D" parent="Damaged"]
+transform = Transform3D(0.866, -0.5, 0, 0.5, 0.866, 0, 0, 0, 1, 0.8, 0.55, 0.4)
+mesh = SubResource("table_top")
+
+[node name="StandingLegs" type="MeshInstance3D" parent="Damaged"]
+position = Vector3(1.8, 0.375, 0.4)
+mesh = SubResource("table_leg")
+
+[node name="FallenLeg" type="MeshInstance3D" parent="Damaged"]
+transform = Transform3D(0.866, 0, 0.5, 0.5, 0, -0.866, 0, 1, 0, 2.3, 0.1, 1.3)
+mesh = SubResource("table_leg")
+
+[node name="ToppledBench" type="MeshInstance3D" parent="Damaged"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0.6, 0.18, -1.3)
+mesh = SubResource("bench")
+
+[node name="Plank0" type="MeshInstance3D" parent="Damaged"]
+transform = Transform3D(0.94, 0, 0.342, 0, 1, 0, -0.342, 0, 0.94, -3.1, 0.07, 2.5)
+mesh = SubResource("plank")
+
+[node name="Plank1" type="MeshInstance3D" parent="Damaged"]
+transform = Transform3D(0.985, 0, -0.174, 0, 1, 0, 0.174, 0, 0.985, -2.7, 0.13, 2.75)
+mesh = SubResource("plank")
+
+[node name="ColdLight" type="OmniLight3D" parent="Damaged"]
+position = Vector3(1.5, 2.6, 0.8)
+light_color = Color(0.55, 0.65, 0.9, 1)
+light_energy = 2.2
+omni_range = 8.0
+
+[node name="Repaired" type="Node3D" parent="."]
+script = ExtResource("toggle")
+flag = "guild.common_room.repaired"
+
+[node name="TableTop" type="MeshInstance3D" parent="Repaired"]
+position = Vector3(0.8, 0.8, 0.4)
+mesh = SubResource("table_top")
+
+[node name="Leg0" type="MeshInstance3D" parent="Repaired"]
+position = Vector3(-0.2, 0.375, -0.05)
+mesh = SubResource("table_leg")
+
+[node name="Leg1" type="MeshInstance3D" parent="Repaired"]
+position = Vector3(1.8, 0.375, -0.05)
+mesh = SubResource("table_leg")
+
+[node name="Leg2" type="MeshInstance3D" parent="Repaired"]
+position = Vector3(-0.2, 0.375, 0.85)
+mesh = SubResource("table_leg")
+
+[node name="Leg3" type="MeshInstance3D" parent="Repaired"]
+position = Vector3(1.8, 0.375, 0.85)
+mesh = SubResource("table_leg")
+
+[node name="BenchNorth" type="MeshInstance3D" parent="Repaired"]
+position = Vector3(0.8, 0.225, -0.45)
+mesh = SubResource("bench")
+
+[node name="BenchSouth" type="MeshInstance3D" parent="Repaired"]
+position = Vector3(0.8, 0.225, 1.25)
+mesh = SubResource("bench")
+
+[node name="TableBody" type="StaticBody3D" parent="Repaired"]
+
+[node name="Shape" type="CollisionShape3D" parent="Repaired/TableBody"]
+position = Vector3(0.8, 0.425, 0.4)
+shape = SubResource("col_table")
+
+[node name="TableLamp" type="MeshInstance3D" parent="Repaired"]
+position = Vector3(1.4, 0.98, 0.4)
+mesh = SubResource("lamp")
+
+[node name="TableLampLight" type="OmniLight3D" parent="Repaired"]
+position = Vector3(1.4, 1.3, 0.4)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 0.8
+omni_range = 3.5
+
+[node name="Fire" type="MeshInstance3D" parent="Repaired"]
+position = Vector3(-1.5, 0.35, -3.05)
+mesh = SubResource("fire")
+
+[node name="FireLight" type="OmniLight3D" parent="Repaired"]
+position = Vector3(-1.5, 1.0, -2.6)
+light_color = Color(1, 0.62, 0.3, 1)
+light_energy = 2.5
+omni_range = 9.0
+
+[node name="Lodger" parent="Repaired" instance=ExtResource("villager")]
+position = Vector3(-0.8, 0, 0.4)
+rotation_degrees = Vector3(0, -90, 0)
+
+[node name="Body" parent="Repaired/Lodger/Visual"]
+surface_material_override/0 = ExtResource("cloak")
+
+[node name="Bucket" parent="Repaired/Lodger/Visual"]
+visible = false
+
+[node name="Dialogue" parent="Repaired/Lodger"]
+dialogue = ExtResource("dlg_lodger")
+
+[node name="HearthUse" type="Area3D" parent="."]
+position = Vector3(-1.5, 0, -2.7)
+script = ExtResource("interactable")
+verb = "Inspect the hearth"
+prompt_height = 1.5
+
+[node name="Reach" type="CollisionShape3D" parent="HearthUse"]
+shape = SubResource("reach")
+
+[node name="Dialogue" type="Node" parent="HearthUse" node_paths=PackedStringArray("interactable")]
+script = ExtResource("trigger")
+dialogue = ExtResource("dlg_hearth")
+interactable = NodePath("..")
+
+[node name="Interior" type="Area3D" parent="." node_paths=PackedStringArray("cutaway")]
+position = Vector3(0, 1.5, 0)
+script = ExtResource("interior")
+cutaway = NodePath("../Cutaway")
+
+[node name="Shape" type="CollisionShape3D" parent="Interior"]
+shape = SubResource("room")
+
+[node name="FloorSurface" type="Area3D" parent="."]
+script = ExtResource("surface")
+surface = "wood"
+
+[node name="Shape" type="CollisionShape3D" parent="FloorSurface"]
+shape = SubResource("floor_surface")

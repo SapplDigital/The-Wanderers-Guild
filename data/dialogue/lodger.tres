@@ -1,0 +1,86 @@
+[gd_resource type="Resource" script_class="DialogueData" format=3]
+
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_data.gd" id="data"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_node.gd" id="node"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_choice.gd" id="choice"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_condition.gd" id="cond"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_consequence.gd" id="cons"]
+
+[sub_resource type="Resource" id="cd1"]
+script = ExtResource("cond")
+flag = "npc.lodger.met"
+test = 1
+
+[sub_resource type="Resource" id="cs2"]
+script = ExtResource("cons")
+kind = 0
+key = "npc.lodger.met"
+
+[sub_resource type="Resource" id="ch3"]
+script = ExtResource("choice")
+conditions = Array[ExtResource("cond")]([SubResource("cd1")])
+consequences = Array[ExtResource("cons")]([SubResource("cs2")])
+next = &"first"
+
+[sub_resource type="Resource" id="ch4"]
+script = ExtResource("choice")
+next = &"again"
+
+[sub_resource type="Resource" id="ch5"]
+script = ExtResource("choice")
+text = "What brings you here?"
+next = &"island"
+
+[sub_resource type="Resource" id="ch6"]
+script = ExtResource("choice")
+text = "Welcome to the guild."
+
+[sub_resource type="Resource" id="nd7"]
+script = ExtResource("node")
+id = &"first"
+speaker = "Maren"
+text = "You're the guild? Then I'm your first lodger. A seat by the fire, two coppers a night. I hear you have rent to pay."
+choices = Array[ExtResource("choice")]([SubResource("ch5"), SubResource("ch6")])
+
+[sub_resource type="Resource" id="cs8"]
+script = ExtResource("cons")
+kind = 0
+key = "npc.lodger.told_island"
+
+[sub_resource type="Resource" id="ch9"]
+script = ExtResource("choice")
+text = "I'll go up and look."
+consequences = Array[ExtResource("cons")]([SubResource("cs8")])
+
+[sub_resource type="Resource" id="ch10"]
+script = ExtResource("choice")
+text = "Islands don't drift."
+
+[sub_resource type="Resource" id="nd11"]
+script = ExtResource("node")
+id = &"island"
+speaker = "Maren"
+text = "I map things that won't stay put. That island hanging over the forest isn't where my chart puts it. Climb to the overlook past the old wood and watch it against the clouds. Tell me if it's drifting."
+choices = Array[ExtResource("choice")]([SubResource("ch9"), SubResource("ch10")])
+
+[sub_resource type="Resource" id="ch12"]
+script = ExtResource("choice")
+text = "About that island..."
+next = &"island"
+
+[sub_resource type="Resource" id="ch13"]
+script = ExtResource("choice")
+text = "Goodbye."
+
+[sub_resource type="Resource" id="nd14"]
+script = ExtResource("node")
+id = &"again"
+speaker = "Maren"
+text = "Warm in here, now. Have you been up to the overlook yet?"
+choices = Array[ExtResource("choice")]([SubResource("ch12"), SubResource("ch13")])
+
+[resource]
+script = ExtResource("data")
+id = &"lodger"
+entries = Array[ExtResource("choice")]([SubResource("ch3"), SubResource("ch4")])
+nodes = Array[ExtResource("node")]([SubResource("nd7"), SubResource("nd11"), SubResource("nd14")])

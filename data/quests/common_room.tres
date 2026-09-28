@@ -1,0 +1,60 @@
+[gd_resource type="Resource" script_class="QuestData" format=3]
+
+[ext_resource type="Script" path="res://scripts/quests/data/quest_data.gd" id="quest"]
+[ext_resource type="Script" path="res://scripts/quests/data/quest_objective.gd" id="objective"]
+[ext_resource type="Script" path="res://scripts/quests/data/quest_outcome.gd" id="outcome"]
+[ext_resource type="Script" path="res://scripts/dialogue/data/dialogue_condition.gd" id="cond"]
+
+[sub_resource type="Resource" id="cd1"]
+script = ExtResource("cond")
+flag = "quest.common_room.accepted"
+test = 0
+
+[sub_resource type="Resource" id="cd2"]
+script = ExtResource("cond")
+flag = "quest.common_room.has_timber"
+test = 0
+
+[sub_resource type="Resource" id="ob3"]
+script = ExtResource("objective")
+text = "Find timber to mend the table and shutters."
+done_when = Array[ExtResource("cond")]([SubResource("cd2")])
+
+[sub_resource type="Resource" id="cd4"]
+script = ExtResource("cond")
+flag = "quest.common_room.has_ember"
+test = 0
+
+[sub_resource type="Resource" id="ob5"]
+script = ExtResource("objective")
+text = "Find a live coal for the hearth."
+done_when = Array[ExtResource("cond")]([SubResource("cd4")])
+
+[sub_resource type="Resource" id="cd6"]
+script = ExtResource("cond")
+flag = "guild.common_room.repaired"
+test = 0
+
+[sub_resource type="Resource" id="ob7"]
+script = ExtResource("objective")
+text = "Repair the common room at the hearth."
+done_when = Array[ExtResource("cond")]([SubResource("cd6")])
+
+[sub_resource type="Resource" id="cd8"]
+script = ExtResource("cond")
+flag = "guild.common_room.repaired"
+test = 0
+
+[sub_resource type="Resource" id="oc9"]
+script = ExtResource("outcome")
+id = &"repaired"
+text = "The common room is warm again."
+conditions = Array[ExtResource("cond")]([SubResource("cd8")])
+
+[resource]
+script = ExtResource("quest")
+id = &"common_room"
+title = "Repair the Common Room"
+accepted_when = Array[ExtResource("cond")]([SubResource("cd1")])
+objectives = Array[ExtResource("objective")]([SubResource("ob3"), SubResource("ob5"), SubResource("ob7")])
+outcomes = Array[ExtResource("outcome")]([SubResource("oc9")])
