@@ -1,0 +1,24 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/camera/camera_controller.gd" id="1_cam"]
+
+[sub_resource type="SphereShape3D" id="probe"]
+radius = 0.4
+
+[node name="CameraRig" type="Node3D"]
+script = ExtResource("1_cam")
+
+[node name="Pitch" type="Node3D" parent="."]
+
+[node name="SpringArm3D" type="SpringArm3D" parent="Pitch"]
+collision_mask = 1
+shape = SubResource("probe")
+spring_length = 16.0
+margin = 0.2
+
+[node name="Anchor" type="Node3D" parent="Pitch/SpringArm3D"]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+current = true
+fov = 40.0
+far = 900.0

@@ -1,0 +1,60 @@
+[gd_scene format=3]
+
+[ext_resource type="Material" path="res://art/materials/wood.tres" id="1_wood"]
+[ext_resource type="Material" path="res://art/materials/lantern_glow.tres" id="2_glow"]
+
+[sub_resource type="BoxMesh" id="board"]
+material = ExtResource("1_wood")
+size = Vector3(1.8, 1.1, 0.12)
+
+[sub_resource type="BoxMesh" id="post"]
+material = ExtResource("1_wood")
+size = Vector3(0.12, 1.9, 0.12)
+
+[sub_resource type="BoxMesh" id="note"]
+size = Vector3(0.35, 0.45, 0.02)
+
+[sub_resource type="BoxMesh" id="candle"]
+material = ExtResource("2_glow")
+size = Vector3(0.08, 0.15, 0.08)
+
+[sub_resource type="BoxShape3D" id="col"]
+size = Vector3(1.9, 1.9, 0.3)
+
+[node name="NoticeBoard" type="StaticBody3D"]
+
+[node name="PostL" type="MeshInstance3D" parent="."]
+position = Vector3(-0.8, 0.95, 0)
+mesh = SubResource("post")
+
+[node name="PostR" type="MeshInstance3D" parent="."]
+position = Vector3(0.8, 0.95, 0)
+mesh = SubResource("post")
+
+[node name="Board" type="MeshInstance3D" parent="."]
+position = Vector3(0, 1.4, 0)
+mesh = SubResource("board")
+
+[node name="Note1" type="MeshInstance3D" parent="."]
+position = Vector3(-0.45, 1.45, 0.07)
+rotation_degrees = Vector3(0, 0, 4)
+mesh = SubResource("note")
+
+[node name="Note2" type="MeshInstance3D" parent="."]
+position = Vector3(0.2, 1.35, 0.07)
+rotation_degrees = Vector3(0, 0, -6)
+mesh = SubResource("note")
+
+[node name="Candle" type="MeshInstance3D" parent="."]
+position = Vector3(0.75, 2.0, 0.1)
+mesh = SubResource("candle")
+
+[node name="CandleLight" type="OmniLight3D" parent="."]
+position = Vector3(0.75, 2.1, 0.4)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 0.7
+omni_range = 3.0
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.95, 0)
+shape = SubResource("col")

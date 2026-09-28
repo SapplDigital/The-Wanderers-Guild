@@ -1,0 +1,70 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player.gd" id="1_player"]
+[ext_resource type="Material" path="res://art/materials/cloak.tres" id="2_cloak"]
+[ext_resource type="Material" path="res://art/materials/lantern_glow.tres" id="3_glow"]
+[ext_resource type="Script" path="res://scripts/interaction/interactor.gd" id="4_interactor"]
+[ext_resource type="Script" path="res://scripts/player/footsteps.gd" id="5_steps"]
+
+[sub_resource type="SphereShape3D" id="reach"]
+radius = 1.8
+
+[sub_resource type="CapsuleShape3D" id="col"]
+radius = 0.35
+height = 1.7
+
+[sub_resource type="CapsuleMesh" id="body"]
+material = ExtResource("2_cloak")
+radius = 0.35
+height = 1.4
+radial_segments = 8
+rings = 2
+
+[sub_resource type="SphereMesh" id="head"]
+material = ExtResource("2_cloak")
+radius = 0.25
+height = 0.5
+radial_segments = 8
+rings = 4
+
+[sub_resource type="BoxMesh" id="lamp"]
+material = ExtResource("3_glow")
+size = Vector3(0.14, 0.18, 0.14)
+
+[node name="Player" type="CharacterBody3D"]
+collision_layer = 2
+script = ExtResource("1_player")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.85, 0)
+shape = SubResource("col")
+
+[node name="Visual" type="Node3D" parent="."]
+
+[node name="Body" type="MeshInstance3D" parent="Visual"]
+position = Vector3(0, 0.7, 0)
+mesh = SubResource("body")
+
+[node name="Head" type="MeshInstance3D" parent="Visual"]
+position = Vector3(0, 1.55, -0.05)
+mesh = SubResource("head")
+
+[node name="Lamp" type="MeshInstance3D" parent="Visual"]
+position = Vector3(0.35, 0.8, -0.3)
+mesh = SubResource("lamp")
+
+[node name="LampLight" type="OmniLight3D" parent="Visual"]
+position = Vector3(0.35, 0.9, -0.3)
+light_color = Color(1, 0.7, 0.4, 1)
+light_energy = 1.2
+omni_range = 5.0
+
+[node name="Interactor" type="Area3D" parent="."]
+script = ExtResource("4_interactor")
+
+[node name="Reach" type="CollisionShape3D" parent="Interactor"]
+position = Vector3(0, 0.9, 0)
+shape = SubResource("reach")
+
+[node name="Footsteps" type="Node3D" parent="."]
+script = ExtResource("5_steps")

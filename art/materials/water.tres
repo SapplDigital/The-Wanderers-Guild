@@ -1,0 +1,28 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[sub_resource type="FastNoiseLite" id="noise"]
+frequency = 0.023
+fractal_octaves = 2
+
+[sub_resource type="Gradient" id="palette"]
+interpolation_mode = 1
+offsets = PackedFloat32Array(0.000, 0.250, 0.500, 0.750)
+colors = PackedColorArray(0.078, 0.161, 0.227, 1, 0.106, 0.235, 0.314, 1, 0.149, 0.329, 0.400, 1, 0.239, 0.463, 0.502, 1)
+
+[sub_resource type="NoiseTexture2D" id="tex"]
+width = 64
+height = 64
+seamless = true
+color_ramp = SubResource("palette")
+noise = SubResource("noise")
+
+[resource]
+albedo_texture = SubResource("tex")
+texture_filter = 2
+uv1_triplanar = true
+uv1_world_triplanar = true
+uv1_scale = Vector3(0.25, 0.25, 0.25)
+transparency = 1
+albedo_color = Color(1, 1, 1, 0.85)
+roughness = 0.55
+metallic = 0.0

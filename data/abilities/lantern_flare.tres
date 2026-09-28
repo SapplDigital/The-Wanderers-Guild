@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/data/ability_data.gd" id="script"]
+[ext_resource type="Resource" path="res://data/statuses/dazzled.tres" id="e0"]
+
+[resource]
+script = ExtResource("script")
+id = &"lantern_flare"
+display_name = "Lantern Flare"
+description = "Unshutter the lantern at a target in sight. Light burns a little and dazzles a lot."
+cost = 0
+kind = 0
+range_min = 2
+range_max = 5
+needs_line_of_sight = true
+damage_die = 4
+damage_bonus = 0
+applies_status = ExtResource("e0")
