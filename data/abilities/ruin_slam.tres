@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/data/ability_data.gd" id="script"]
+
+[resource]
+script = ExtResource("script")
+id = &"ruin_slam"
+display_name = "Ruin Slam"
+description = "A ponderous arc that lands hard if you remain in reach."
+cost = 0
+kind = 0
+range_min = 0.0
+range_max = 2.2
+damage_die = 10
+damage_bonus = 2

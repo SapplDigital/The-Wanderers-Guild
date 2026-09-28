@@ -7,15 +7,18 @@
 [ext_resource type="AudioStream" path="res://audio/ambience/village_distant.ogg" id="s2"]
 [ext_resource type="AudioStream" path="res://audio/ambience/wind_pines.ogg" id="s3"]
 [ext_resource type="AudioStream" path="res://audio/music/sting_discovery.ogg" id="s4"]
-[ext_resource type="AudioStream" path="res://audio/sfx/combat_hit.ogg" id="s5"]
-[ext_resource type="AudioStream" path="res://audio/sfx/combat_miss.ogg" id="s6"]
-[ext_resource type="AudioStream" path="res://audio/sfx/interact_handle.ogg" id="s7"]
-[ext_resource type="AudioStream" path="res://audio/sfx/shrine_awaken.ogg" id="s8"]
-[ext_resource type="AudioStream" path="res://audio/sfx/step_dirt.ogg" id="s9"]
-[ext_resource type="AudioStream" path="res://audio/sfx/step_grass.ogg" id="s10"]
-[ext_resource type="AudioStream" path="res://audio/sfx/step_wood.ogg" id="s11"]
-[ext_resource type="AudioStream" path="res://audio/sfx/wisp_hum.ogg" id="s12"]
-[ext_resource type="AudioStream" path="res://audio/ui/ui_confirm.ogg" id="s13"]
+[ext_resource type="AudioStream" path="res://audio/sfx/boar_down.ogg" id="s5"]
+[ext_resource type="AudioStream" path="res://audio/sfx/combat_hit.ogg" id="s6"]
+[ext_resource type="AudioStream" path="res://audio/sfx/combat_miss.ogg" id="s7"]
+[ext_resource type="AudioStream" path="res://audio/sfx/combat_reaction.ogg" id="s8"]
+[ext_resource type="AudioStream" path="res://audio/sfx/interact_handle.ogg" id="s9"]
+[ext_resource type="AudioStream" path="res://audio/sfx/shrine_awaken.ogg" id="s10"]
+[ext_resource type="AudioStream" path="res://audio/sfx/step_dirt.ogg" id="s11"]
+[ext_resource type="AudioStream" path="res://audio/sfx/step_grass.ogg" id="s12"]
+[ext_resource type="AudioStream" path="res://audio/sfx/step_wood.ogg" id="s13"]
+[ext_resource type="AudioStream" path="res://audio/sfx/wisp_hum.ogg" id="s14"]
+[ext_resource type="AudioStream" path="res://audio/ui/turn_start.ogg" id="s15"]
+[ext_resource type="AudioStream" path="res://audio/ui/ui_confirm.ogg" id="s16"]
 
 [sub_resource type="Resource" id="amb_forest"]
 script = ExtResource("event")
@@ -59,7 +62,7 @@ max_distance = 40.0
 
 [sub_resource type="Resource" id="wisp_hum"]
 script = ExtResource("event")
-streams = Array[AudioStream]([ExtResource("s12")])
+streams = Array[AudioStream]([ExtResource("s14")])
 bus = &"SFX"
 volume_db = -16.0
 pitch_variance = 0.06
@@ -69,7 +72,7 @@ max_distance = 16.0
 
 [sub_resource type="Resource" id="shrine_hum"]
 script = ExtResource("event")
-streams = Array[AudioStream]([ExtResource("s12")])
+streams = Array[AudioStream]([ExtResource("s14")])
 bus = &"SFX"
 volume_db = -10.0
 pitch_variance = 0.0
@@ -79,7 +82,7 @@ max_distance = 24.0
 
 [sub_resource type="Resource" id="well_hum"]
 script = ExtResource("event")
-streams = Array[AudioStream]([ExtResource("s12")])
+streams = Array[AudioStream]([ExtResource("s14")])
 bus = &"SFX"
 volume_db = -18.0
 pitch_variance = 0.0
@@ -89,7 +92,7 @@ max_distance = 14.0
 
 [sub_resource type="Resource" id="interact"]
 script = ExtResource("event")
-streams = Array[AudioStream]([ExtResource("s7")])
+streams = Array[AudioStream]([ExtResource("s9")])
 bus = &"SFX"
 volume_db = -4.0
 pitch_variance = 0.08
@@ -99,7 +102,7 @@ max_distance = 20.0
 
 [sub_resource type="Resource" id="shrine_awaken"]
 script = ExtResource("event")
-streams = Array[AudioStream]([ExtResource("s8")])
+streams = Array[AudioStream]([ExtResource("s10")])
 bus = &"SFX"
 volume_db = -4.0
 pitch_variance = 0.0
@@ -109,7 +112,7 @@ max_distance = 60.0
 
 [sub_resource type="Resource" id="step_grass"]
 script = ExtResource("event")
-streams = Array[AudioStream]([ExtResource("s10")])
+streams = Array[AudioStream]([ExtResource("s12")])
 bus = &"SFX"
 volume_db = -14.0
 pitch_variance = 0.12
@@ -119,7 +122,7 @@ max_distance = 20.0
 
 [sub_resource type="Resource" id="step_dirt"]
 script = ExtResource("event")
-streams = Array[AudioStream]([ExtResource("s9")])
+streams = Array[AudioStream]([ExtResource("s11")])
 bus = &"SFX"
 volume_db = -16.0
 pitch_variance = 0.12
@@ -129,7 +132,7 @@ max_distance = 20.0
 
 [sub_resource type="Resource" id="step_wood"]
 script = ExtResource("event")
-streams = Array[AudioStream]([ExtResource("s11")])
+streams = Array[AudioStream]([ExtResource("s13")])
 bus = &"SFX"
 volume_db = -12.0
 pitch_variance = 0.1
@@ -139,7 +142,7 @@ max_distance = 20.0
 
 [sub_resource type="Resource" id="step_mud"]
 script = ExtResource("event")
-streams = Array[AudioStream]([ExtResource("s9")])
+streams = Array[AudioStream]([ExtResource("s11")])
 bus = &"SFX"
 volume_db = -12.0
 pitch_variance = 0.15
@@ -149,7 +152,7 @@ max_distance = 20.0
 
 [sub_resource type="Resource" id="step_water"]
 script = ExtResource("event")
-streams = Array[AudioStream]([ExtResource("s10")])
+streams = Array[AudioStream]([ExtResource("s12")])
 bus = &"SFX"
 volume_db = -10.0
 pitch_variance = 0.2
@@ -159,7 +162,7 @@ max_distance = 20.0
 
 [sub_resource type="Resource" id="combat_hit"]
 script = ExtResource("event")
-streams = Array[AudioStream]([ExtResource("s5")])
+streams = Array[AudioStream]([ExtResource("s6")])
 bus = &"SFX"
 volume_db = -6.0
 pitch_variance = 0.1
@@ -169,7 +172,7 @@ max_distance = 30.0
 
 [sub_resource type="Resource" id="combat_miss"]
 script = ExtResource("event")
-streams = Array[AudioStream]([ExtResource("s6")])
+streams = Array[AudioStream]([ExtResource("s7")])
 bus = &"SFX"
 volume_db = -10.0
 pitch_variance = 0.1
@@ -177,9 +180,39 @@ loop = false
 unit_size = 5.0
 max_distance = 30.0
 
+[sub_resource type="Resource" id="reaction"]
+script = ExtResource("event")
+streams = Array[AudioStream]([ExtResource("s8")])
+bus = &"SFX"
+volume_db = -6.0
+pitch_variance = 0.05
+loop = false
+unit_size = 6.0
+max_distance = 40.0
+
+[sub_resource type="Resource" id="enemy_down"]
+script = ExtResource("event")
+streams = Array[AudioStream]([ExtResource("s5")])
+bus = &"SFX"
+volume_db = -6.0
+pitch_variance = 0.08
+loop = false
+unit_size = 6.0
+max_distance = 40.0
+
+[sub_resource type="Resource" id="turn_start"]
+script = ExtResource("event")
+streams = Array[AudioStream]([ExtResource("s15")])
+bus = &"UI"
+volume_db = -12.0
+pitch_variance = 0.0
+loop = false
+unit_size = 6.0
+max_distance = 40.0
+
 [sub_resource type="Resource" id="ui_confirm"]
 script = ExtResource("event")
-streams = Array[AudioStream]([ExtResource("s13")])
+streams = Array[AudioStream]([ExtResource("s16")])
 bus = &"UI"
 volume_db = -16.0
 pitch_variance = 0.05
@@ -199,4 +232,4 @@ max_distance = 40.0
 
 [resource]
 script = ExtResource("bank")
-events = {&"amb_forest": SubResource("amb_forest"), &"amb_wind": SubResource("amb_wind"), &"amb_village": SubResource("amb_village"), &"amb_combat": SubResource("amb_combat"), &"wisp_hum": SubResource("wisp_hum"), &"shrine_hum": SubResource("shrine_hum"), &"well_hum": SubResource("well_hum"), &"interact": SubResource("interact"), &"shrine_awaken": SubResource("shrine_awaken"), &"step_grass": SubResource("step_grass"), &"step_dirt": SubResource("step_dirt"), &"step_wood": SubResource("step_wood"), &"step_mud": SubResource("step_mud"), &"step_water": SubResource("step_water"), &"combat_hit": SubResource("combat_hit"), &"combat_miss": SubResource("combat_miss"), &"ui_confirm": SubResource("ui_confirm"), &"discovery": SubResource("discovery")}
+events = {&"amb_forest": SubResource("amb_forest"), &"amb_wind": SubResource("amb_wind"), &"amb_village": SubResource("amb_village"), &"amb_combat": SubResource("amb_combat"), &"wisp_hum": SubResource("wisp_hum"), &"shrine_hum": SubResource("shrine_hum"), &"well_hum": SubResource("well_hum"), &"interact": SubResource("interact"), &"shrine_awaken": SubResource("shrine_awaken"), &"step_grass": SubResource("step_grass"), &"step_dirt": SubResource("step_dirt"), &"step_wood": SubResource("step_wood"), &"step_mud": SubResource("step_mud"), &"step_water": SubResource("step_water"), &"combat_hit": SubResource("combat_hit"), &"combat_miss": SubResource("combat_miss"), &"reaction": SubResource("reaction"), &"enemy_down": SubResource("enemy_down"), &"turn_start": SubResource("turn_start"), &"ui_confirm": SubResource("ui_confirm"), &"discovery": SubResource("discovery")}

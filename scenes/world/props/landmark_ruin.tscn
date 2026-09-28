@@ -19,7 +19,26 @@ size = Vector3(34, 6, 7)
 material = ExtResource("2_glow")
 size = Vector3(3, 9, 3)
 
+[sub_resource type="CylinderShape3D" id="pillar_left_col"]
+radius = 3.6
+height = 40.0
+
+[sub_resource type="CylinderShape3D" id="pillar_right_col"]
+radius = 3.6
+height = 28.0
+
 [node name="LandmarkRuin" type="Node3D"]
+
+[node name="Pillars" type="StaticBody3D" parent="."]
+
+[node name="PillarLeftCol" type="CollisionShape3D" parent="Pillars"]
+position = Vector3(-13, 20, 0)
+shape = SubResource("pillar_left_col")
+
+[node name="PillarRightCol" type="CollisionShape3D" parent="Pillars"]
+position = Vector3(13, 14, 0)
+rotation_degrees = Vector3(0, 0, -6)
+shape = SubResource("pillar_right_col")
 
 [node name="PillarLeft" type="MeshInstance3D" parent="."]
 position = Vector3(-13, 20, 0)

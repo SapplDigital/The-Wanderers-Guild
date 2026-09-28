@@ -6,8 +6,8 @@
 script = ExtResource("script")
 id = &"nimble_step"
 display_name = "Nimble Step"
-description = "Light on your feet: +2 movement, and moving this turn provokes no opportunity strikes."
+description = "Light on your feet: +3 m movement, and moving this turn provokes no opportunity strikes."
 cost = 1
 kind = 1
-extra_movement = 2
+extra_movement = 3.0
 prevents_reactions = true

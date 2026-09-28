@@ -18,8 +18,11 @@
 [ext_resource type="Script" path="res://scripts/audio/sound_emitter.gd" id="emitter"]
 [ext_resource type="Script" path="res://scripts/audio/ambience_zone.gd" id="ambience"]
 [ext_resource type="Script" path="res://scripts/world/surface_area.gd" id="surface"]
-[ext_resource type="Script" path="res://scripts/combat/combat_arena.gd" id="arena"]
+[ext_resource type="Script" path="res://scripts/combat/combat_area.gd" id="combat_area"]
+[ext_resource type="Script" path="res://scripts/world/high_ground.gd" id="high_ground"]
 [ext_resource type="Resource" path="res://data/encounters/clearing_boars.tres" id="enc_boars"]
+[ext_resource type="Resource" path="res://data/encounters/forest_edge_midges.tres" id="enc_midges"]
+[ext_resource type="Resource" path="res://data/encounters/broken_gate_guardian.tres" id="enc_guardian"]
 [ext_resource type="Resource" path="res://data/actors/wanderer.tres" id="wanderer"]
 [ext_resource type="Material" path="res://art/materials/grass.tres" id="grass"]
 [ext_resource type="Material" path="res://art/materials/dirt.tres" id="dirt"]
@@ -2358,18 +2361,22 @@ shape = SubResource("zone_s")
 
 [node name="CombatClearing" type="Node3D" parent="Forest"]
 
-[node name="Arena" type="Node3D" parent="Forest/CombatClearing" node_paths=PackedStringArray("camera_rig", "player")]
+[node name="CombatArea" type="Node3D" parent="Forest/CombatClearing" node_paths=PackedStringArray("camera_rig", "player")]
 position = Vector3(28, 0, -34)
-script = ExtResource("arena")
+script = ExtResource("combat_area")
 encounter = ExtResource("enc_boars")
 player_data = ExtResource("wanderer")
 camera_rig = NodePath("../../../CameraRig")
 player = NodePath("../../../Player")
 
-[node name="Trigger" type="Area3D" parent="Forest/CombatClearing/Arena"]
+[node name="Trigger" type="Area3D" parent="Forest/CombatClearing/CombatArea"]
 
-[node name="Shape" type="CollisionShape3D" parent="Forest/CombatClearing/Arena/Trigger"]
+[node name="Shape" type="CollisionShape3D" parent="Forest/CombatClearing/CombatArea/Trigger"]
 shape = SubResource("zone_s")
+
+[node name="Mound" type="Node3D" parent="Forest/CombatClearing"]
+position = Vector3(23.00, 0.00, -36.00)
+script = ExtResource("high_ground")
 
 [node name="CoverRock0" parent="Forest/CombatClearing" instance=ExtResource("rock")]
 position = Vector3(26.00, 0.00, -35.00)
@@ -2417,6 +2424,44 @@ layers = Array[StringName]([&"amb_combat", &"amb_forest"])
 
 [node name="Shape" type="CollisionShape3D" parent="Forest/CombatClearing/CombatAmbience"]
 shape = SubResource("amb_combat_zone")
+
+[node name="MidgeStones" type="Node3D" parent="Forest"]
+
+[node name="CombatArea" type="Node3D" parent="Forest/MidgeStones" node_paths=PackedStringArray("camera_rig", "player")]
+position = Vector3(4, 0, -130)
+script = ExtResource("combat_area")
+encounter = ExtResource("enc_midges")
+player_data = ExtResource("wanderer")
+camera_rig = NodePath("../../../CameraRig")
+player = NodePath("../../../Player")
+
+[node name="Trigger" type="Area3D" parent="Forest/MidgeStones/CombatArea"]
+
+[node name="Shape" type="CollisionShape3D" parent="Forest/MidgeStones/CombatArea/Trigger"]
+shape = SubResource("zone_s")
+
+[node name="Stone0" parent="Forest/MidgeStones" instance=ExtResource("rock")]
+position = Vector3(6.00, 0.00, -128.00)
+
+[node name="Stone1" parent="Forest/MidgeStones" instance=ExtResource("rock")]
+position = Vector3(1.50, 0.00, -131.00)
+scale = Vector3(0.9, 0.81, 0.9)
+
+[node name="Stone2" parent="Forest/MidgeStones" instance=ExtResource("rock")]
+position = Vector3(5.00, 0.00, -133.50)
+scale = Vector3(1.1, 0.99, 1.1)
+
+[node name="Mud" parent="Forest/MidgeStones" type="MeshInstance3D"]
+position = Vector3(1.50, 0.03, -127.00)
+mesh = SubResource("mud_mesh")
+
+[node name="MudSurface" type="Area3D" parent="Forest/MidgeStones"]
+position = Vector3(1.50, 0.00, -127.00)
+script = ExtResource("surface")
+surface = "mud"
+
+[node name="Shape" type="CollisionShape3D" parent="Forest/MidgeStones/MudSurface"]
+shape = SubResource("mud_surface")
 
 [node name="ResourceNodes" type="Node3D" parent="Forest"]
 
@@ -2582,6 +2627,29 @@ title = "The Broken Gate"
 
 [node name="Shape" type="CollisionShape3D" parent="Landmarks/RuinZone"]
 shape = SubResource("zone_l")
+
+[node name="GateGuardian" type="Node3D" parent="Landmarks"]
+
+[node name="CombatArea" type="Node3D" parent="Landmarks/GateGuardian" node_paths=PackedStringArray("camera_rig", "player")]
+position = Vector3(-28.6, 0, -161.2)
+script = ExtResource("combat_area")
+encounter = ExtResource("enc_guardian")
+player_data = ExtResource("wanderer")
+camera_rig = NodePath("../../../CameraRig")
+player = NodePath("../../../Player")
+
+[node name="Trigger" type="Area3D" parent="Landmarks/GateGuardian/CombatArea"]
+
+[node name="Shape" type="CollisionShape3D" parent="Landmarks/GateGuardian/CombatArea/Trigger"]
+shape = SubResource("zone_s")
+
+[node name="Rubble0" parent="Landmarks/GateGuardian" instance=ExtResource("rock")]
+position = Vector3(-24.00, 0.00, -160.00)
+scale = Vector3(1.3, 1.17, 1.3)
+
+[node name="Rubble1" parent="Landmarks/GateGuardian" instance=ExtResource("rock")]
+position = Vector3(-33.00, 0.00, -164.00)
+scale = Vector3(1.5, 1.35, 1.5)
 
 [node name="FloatingIsland" type="Node3D" parent="Landmarks"]
 position = Vector3(60, 130, -400)

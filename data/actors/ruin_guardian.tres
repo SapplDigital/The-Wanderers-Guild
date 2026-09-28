@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ActorData" format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/data/actor_data.gd" id="actor"]
+[ext_resource type="Resource" path="res://data/abilities/ruin_slam.tres" id="slam"]
+[ext_resource type="Script" path="res://scripts/combat/ai/guardian_brain.gd" id="brain"]
+
+[resource]
+script = ExtResource("actor")
+id = &"ruin_guardian"
+display_name = "Mossbound Guardian"
+team = &"enemy"
+max_hp = 22
+defense = 14
+movement = 3.0
+attack_mod = 4
+initiative_mod = -1
+abilities = Array[ExtResource("slam")]([ExtResource("slam")])
+tint = Color(0.48, 0.56, 0.62, 1)
+view_scale = 1.7
+ai_profile = &"elite_ruin_guardian"
+ai_brain = ExtResource("brain")

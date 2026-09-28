@@ -54,21 +54,36 @@ I cannot listen to the output, so this is what is verified and what is not:
 - **Not verified — needs a human ear:** whether the mix balance is right, whether 5-second loops sound repetitive (ElevenLabs caps SFX at 5 s; two layers of different content help but may not hide it), whether the footstep sample (one per surface, pitch-varied) sounds machine-gunny when running.
 - Likely weak spots: 5 s ambience loops; a single interact sound for everything (journal, berries, lantern); no reverb/occlusion.
 
-## Milestone 6: tactical combat prototype (2026-09-28)
+## Milestone 6: world-space combat migration (2026-09-28)
 
-- **Rules vs presentation split.** `CombatGrid` (cells, terrain, occupancy, Dijkstra range/paths, line of sight, cover), `ActionResolver` (d20), `CombatUnit` (runtime state), `CombatState` (turn order + action economy + resolution) are pure logic, tested headless. Commands return an **event log** (`step`, `attack`, `buff`, `defeated`, `turn_start`, `combat_end`) that `CombatController` plays back as animation. Mapping to the master prompt's names: TurnManager = `CombatState` turn order; TargetingSystem = `CombatState.targets_for/in_range`; StatusEffectSystem = `StatusData` + `CombatUnit` statuses; PathfindingService = `CombatGrid.reachable/path_to`; GridBoard/GridCell = `CombatGrid` (cells are plain Vector2i keys, no GridCell object needed yet).
-- **Resolution:** d20 + attack modifier ≥ defense. Natural 20 = hit + damage die rolled twice, natural 1 = miss. Cover (+2) when a low obstacle next to the target lies on the line from a ranged attacker. Water: −1 defense (bad footing). Mud and water cost 2 movement. `hit_chance()` uses the same rule, so the HUD's "Hit 70%" is exact. Verified statistically (4000 rolls, ±3%).
-- **Movement is 4-way (Manhattan)** and range uses the same metric: readable and consistent (Fire Emblem-like). Units can't pass through each other (ponytail: allies passing through each other later if needed).
-- **Reactions are ready from the start of a fight**, one per round, refreshed at the start of the unit's own turn. The only reaction for now: opportunity strike when a foe leaves your reach.
-- **Player kit (original):** Strike (action, melee, 1d8+2), Lantern Flare (action, range 2–5, needs sight, 1d4 + Dazzled −3 to hit for a turn), Nimble Step (bonus: +2 move, moving provokes no reactions), opportunity strike (reaction). Wanderer: 12 HP, DEF 12, move 5, +4. Thornback Boar: 9 HP, DEF 11, move 4, +3, Gore 1d6+1.
-- **The world is the arena.** `CombatArena` scans the real clearing: trees/houses → blocked, `low_cover` group (rocks) → cover, SurfaceArea mud/water → terrain. The clearing's rocks and stream form a natural wall; boars need two turns to reach you, which gives the flare and positioning a purpose.
-- **Engage or bypass:** enemies graze visibly in the clearing before the fight (HP labels hidden until combat, which is UI), the combat ambience bed telegraphs it on approach; entering the trigger starts the fight, walking around doesn't. Victory sets `encounter.<id>.cleared`; defeat is a setback (wake at the edge with 1/3 HP, boars stay), not a game over.
-- **Exploration HP carries into the fight and back.**
-- Combat input: mouse (hover/click) or keyboard/pad cursor (camera-relative), 1/2/3 (X/Y/D-pad up) abilities, confirm = interact, cancel = ui_cancel, end turn = Space/Start. Clicking an enemy in move mode = first attack if in range. Choosing a targeted ability snaps the cursor to the first valid target.
-- Water material made less glossy (roughness 0.55, metallic 0): its moonlight specular turned into a huge bloom blob on the stream at some camera angles. Grid overlay has `render_priority = 1` so it always draws over water.
-- **Scripted in-app runs are not strict replays:** the rules RNG is seeded (`--seed`), but inputs sent at fixed frames can land during busy animations and be ignored. In-app runs verify presentation/flow; correctness lives in `test_combat_rules`.
+The earlier grid prototype is obsolete. The GDD's world-space combat design is authoritative: positions and distances are continuous, and the actual clearing supplies obstacles, cover, terrain and elevation. Do not restore `CombatGrid`, cell coordinates, grid overlays or grid-based UI.
+
+- **Rules vs presentation split.** `CombatSpace` and `CombatState` are testable rules; commands return events which `CombatController` plays back. `CombatArea` scans scene collision and surface data. `TacticalOverlay` draws temporary rings, paths and attack lines only while choosing. `CombatUnit.position` is a `Vector3`; movement plans are distance based and route around obstacles.
+- **Tactical factors:** line of sight, partial cover, terrain cost/defense, height advantage, engagement zones and opportunity attacks are handled in the shared world-space rules. HUD language explains range, cover and blocked sight in metres and plain words.
+- **Encounter design:** enemies are visible before combat; entering the trigger engages, while walking around preserves the option to avoid the encounter. Victory persists the cleared flag; defeat returns the player to the clearing edge. Exploration health carries into and out of combat.
+- **Verification status:** `tests/test_combat_rules.gd` was migrated to world-space cases and checks the combat scripts for grid remnants. Run it and validate the actual scene in Godot before treating this migration as complete; the current handoff environment has no Godot executable/MCP available.
+
+## Pre-M7 design audit (2026-09-28)
+
+- The game is an exploration RPG first. Combat is optional when the encounter fiction allows it; preserve bypass, investigation, negotiation and retreat as future encounter outcomes.
+- Treat enemies as behavior/data profiles rather than assuming all hostile entities are conventional combatants. The three slice archetypes are examples, not an exhaustive model; allow passive, fleeing, territorial, negotiable and world-scale entities later.
+- Do not introduce traditional classes, levels or numerical progression inflation before the core loop proves a need. Keep progression open to equipment, abilities, discoveries, relationships, guild growth and player choices.
+- Environmental rules should follow visible physical causes. Keep the tactical overlay temporary and modest; do not convert every prop into a bonus.
+- The revised GDD and master prompt now use the exploration-first genre and add the audit's slice success criteria. M7 stays gated until the migration and integration are verified.
 
 ### M6 player-experience check
-- **Understandable without a manual?** Mostly: whose turn, move range, path, targets, hit %, damage range, cover and the `[x]/[ ]` action economy are all on screen; the log explains every roll ("rolls 10+4=14 vs 11. Hit for 8"). Not yet explained: *why* you can't reach a cell (cover/water costs are colour-only on the grid when not in move range).
-- **Looks like the world, not a board game:** the grid sits on the real clearing with its rocks, stream and mud; the camera stays the exploration camera at tactical zoom.
+- **At the end of the grid prototype:** the HUD showed turn, movement, targets, hit chance, damage, cover and action economy; the log explained attack rolls. This observation predates the world-space migration and is not evidence for the current interface.
+- **World-space target:** tactical overlays should explain metre range, route cost, threat zones, cover and blocked sight only while deciding; the clearing remains visible and usable as the battlefield.
 - **Weak spots:** placeholder boars are boxes; the move range colour hides terrain tints inside it; the enemy "brain" is a stub (M7); no turn-start sound; the reaction is easy to miss in the log (it has a float text but no distinct sound or camera beat).
+
+## M7 AI dispatcher (2026-09-28)
+
+- **Data chooses the brain; profile labels do not dispatch behavior.** `ActorData.ai_profile` is readable encounter data, while `ActorData.ai_brain` names a `CombatBrain` script. `BrainDispatcher` creates that script and sends only its intent dictionaries to `CombatState`, which continues to validate movement and ability use. Adding passive, fleeing, defensive, territorial, social, negotiable, environmental or unusual creatures requires a data/script choice, not a dispatcher edit.
+- **Three demonstration strategies:** `MeleeBeastBrain` approaches a vulnerable foe; `RangedUtilityBrain` samples legal firing positions and values target exposure, cover and terrain; `GuardianBrain` declares a generic visible intent before its heavy strike. The declaration is transient AI state on `CombatUnit.brain_memory`; combat rules do not interpret it.
+
+## M7 authored encounters (2026-09-28)
+
+- **Three optional encounters, each visible before it starts:** boars in the clearing (unchanged), two Glimmer Midges among three stones and a mud patch at the forest edge (`Forest/MidgeStones`, ~11 m off the direct overlook→gate line, so walking past is a natural choice), and the Mossbound Guardian standing in the Broken Gate (`Landmarks/GateGuardian`, inside the discovery zone, so you see and name the place before the 7 m trigger). Copy lives in `EncounterData` (`engage_message` added; the controller no longer hardcodes "The boars notice you.").
+- **Telegraph = public warning, not rules state.** A `declare` intent may carry `radius`; the dispatcher copies it to `CombatUnit.telegraph_radius`, which the controller draws as a solid hot ring during the player's turn and mentions in the move hint ("Still inside X's swing!"). `forget` clears it. The positional answer is to step out of reach; the guardian (3 m/turn) then lumbers after you still wound up.
+- **Defeat wakes you on the side you came from** (was always centre −x, which lands inside the gate's pillar). The ruin's pillars got collision, so the player can't walk through them and combat treats them as obstacles.
+- **Placeholder bodies:** `ActorData.view_scale` (guardian 1.7, midge 0.6) so the elite reads as big and the midges as small. No new art.

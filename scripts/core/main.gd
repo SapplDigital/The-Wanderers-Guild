@@ -64,9 +64,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("debug_start_combat"):
 		_debug_start_combat()
 	elif event.is_action_pressed("debug_win_combat"):
-		for arena in _world.find_children("*", "CombatArena"):
-			if arena.controller:
-				arena.controller.debug_win()
+		for combat_area in _world.find_children("*", "CombatArea"):
+			if combat_area.controller:
+				combat_area.controller.debug_win()
 
 
 func _process(_delta: float) -> void:
@@ -85,13 +85,15 @@ func _rig() -> CameraController:
 	return _world.get_node("CameraRig")
 
 
-## Walks the player into the first CombatArena's fight (debug shortcut).
+## Walks the player into the nearest CombatArea's fight (debug shortcut).
 func _debug_start_combat() -> void:
-	var arenas := _world.find_children("*", "CombatArena")
-	if arenas and arenas[0].can_start():
-		var player: Node3D = _world.get_node("Player")
-		player.global_position = arenas[0].global_position + Vector3(-6, 0, 0)
-		arenas[0].start()
+	var player: Node3D = _world.get_node("Player")
+	var areas := _world.find_children("*", "CombatArea")
+	areas.sort_custom(func(a: Node3D, b: Node3D) -> bool:
+		return a.global_position.distance_to(player.global_position) < b.global_position.distance_to(player.global_position))
+	if areas and areas[0].can_start():
+		player.global_position = areas[0].global_position + Vector3(-6, 0, 0)
+		areas[0].start()
 
 
 ## Plays the first CinematicReveal in the world, wherever the player stands.
@@ -131,8 +133,8 @@ func _handle_cli_screenshot(args: Dictionary) -> void:
 		pad.pressed = true
 		Input.parse_input_event(pad)
 	if args.has("seed"):
-		for arena in _world.find_children("*", "CombatArena"):
-			arena.rng_seed = int(args.seed)
+		for combat_area in _world.find_children("*", "CombatArea"):
+			combat_area.rng_seed = int(args.seed)
 	for key in (args.get("flags", "") as String).split(",", false):
 		GameState.set_flag(key)
 	_debug_label.visible = args.has("overlay")
@@ -158,27 +160,21 @@ func _handle_cli_screenshot(args: Dictionary) -> void:
 			var t: PackedFloat64Array = (args.then as String).split_floats(",")
 			_world.get_node("Player").global_position = Vector3(t[0], t[1], t[2])
 			_rig().global_position = Vector3(t[0], t[1], t[2])
-	get_viewport().get_texture().get_image().save_png(args.shot)
+	var shot_texture := get_viewport().get_texture() if DisplayServer.get_name() != "headless" else null
+	var shot_image := shot_texture.get_image() if shot_texture else null
+	if shot_image:
+		shot_image.save_png(args.shot)
+	else:
+		print("shot skipped: the active renderer does not expose viewport pixels")
 	print("shot: player at ", _world.get_node("Player").global_position, " camera=", CameraController.State.keys()[_rig().state], " flags=", GameState.flags, _combat_summary())
 	get_tree().quit()
 
 
 func _combat_summary() -> String:
-	for arena in _world.find_children("*", "CombatArena"):
-		if arena.controller:
-			var st: CombatState = arena.controller.state
+	for combat_area in _world.find_children("*", "CombatArea"):
+		if combat_area.controller:
+			var st: CombatState = combat_area.controller.state
 			var parts := st.order.map(func(u: CombatUnit) -> String:
-				return "%s@%s %d/%dhp" % [u.data.display_name, u.cell, u.hp, u.data.max_hp])
-			var rows: Array[String] = []
-			for y in st.grid.size.y:
-				var row := ""
-				for x in st.grid.size.x:
-					var c := Vector2i(x, y)
-					var t: StringName = st.grid.terrain(c)
-					row += "U" if st.grid.occupant.has(c) else ["c", "#"][st.grid.kind(c) - 1] if st.grid.kind(c) != CombatGrid.Kind.OPEN 						else ("~" if t == &"water" else "m" if t == &"mud" else ".")
-				rows.append(row)
-			return "
-  combat round %d, turn: %s, order: %s
-  %s" % [st.round_number, st.current().data.display_name, ", ".join(parts), "
-  ".join(rows)]
+				return "%s@(%0.1f,%0.1f) %d/%dhp" % [u.data.display_name, u.position.x, u.position.z, u.hp, u.data.max_hp])
+			return "\n  combat round %d, turn: %s, order: %s" % [st.round_number, st.current().data.display_name, ", ".join(parts)]
 	return ""

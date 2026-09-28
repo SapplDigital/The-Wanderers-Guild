@@ -22,5 +22,6 @@ static func attack(rng: RandomNumberGenerator, attack_mod: int, defense: int, di
 	return {"roll": roll, "total": roll + attack_mod, "defense": defense, "hit": hit, "crit": crit, "damage": damage}
 
 
-static func damage_range(die: int, bonus: int) -> Vector2i:
-	return Vector2i(1 + bonus, die + bonus)
+## Minimum and maximum damage of a normal hit (x = min, y = max).
+static func damage_range(die: int, bonus: int) -> Vector2:
+	return Vector2(1 + bonus, die + bonus)

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="ActorData" format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/data/actor_data.gd" id="actor"]
+[ext_resource type="Resource" path="res://data/abilities/spore_glob.tres" id="spore"]
+[ext_resource type="Script" path="res://scripts/combat/ai/ranged_utility_brain.gd" id="brain"]
+
+[resource]
+script = ExtResource("actor")
+id = &"glimmer_midge"
+display_name = "Glimmer Midge"
+team = &"enemy"
+max_hp = 7
+defense = 10
+movement = 5.5
+attack_mod = 2
+initiative_mod = 3
+abilities = Array[ExtResource("spore")]([ExtResource("spore")])
+tint = Color(0.42, 0.84, 0.72, 1)
+view_scale = 0.6
+ai_profile = &"ranged_utility"
+ai_brain = ExtResource("brain")

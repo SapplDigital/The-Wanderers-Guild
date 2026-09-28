@@ -1,7 +1,8 @@
 extends CanvasLayer
-## Combat HUD (inside the pixel viewport). Shows whose turn it is, the active unit's
-## action economy ([x] available / [ ] spent, never colour alone), the ability bar with keys,
-## hovered target info with the predicted result, and a short combat log.
+## Combat HUD (inside the pixel viewport). Whose turn it is, the active unit's action economy
+## ([x] available / [ ] spent, never colour alone), movement left in metres, the ability bar with
+## keys, one plain-language line about the current move, the target and why it is easy or hard,
+## and a short combat log.
 
 const LOG_LINES := 3
 
@@ -10,6 +11,7 @@ const LOG_LINES := 3
 @onready var _unit: Label = $Root/Unit
 @onready var _abilities: Label = $Root/Abilities
 @onready var _target: Label = $Root/Target
+@onready var _plan: Label = $Root/Plan
 @onready var _log: Label = $Root/Log
 
 var _controller: CombatController
@@ -24,6 +26,7 @@ func _ready() -> void:
 func open(controller: CombatController) -> void:
 	_controller = controller
 	_lines.clear()
+	_log.text = ""
 	_root.visible = true
 	refresh()
 
@@ -50,39 +53,26 @@ func refresh() -> void:
 		.map(func(u: CombatUnit) -> String: return ("> " if u == current else "") + u.data.display_name)
 	_turn.text = "Round %d\n%s" % [state.round_number, "   ".join(order)]
 
-	_unit.text = "%s   %d/%d HP\nMove %d   %s Action   %s Bonus   %s Reaction%s" % [
-		me.data.display_name, me.hp, me.data.max_hp, me.movement_left,
-		_box(me.has_action), _box(me.has_bonus), _box(me.has_reaction), _status_text(me)]
+	var statuses := me.statuses.map(func(s: Dictionary) -> String: return "%s (%d)" % [s.status.display_name, s.turns_left])
+	_unit.text = "%s   %d/%d HP%s\nMove %.1f m   %s Action   %s Bonus   %s Reaction" % [
+		me.data.display_name, me.hp, me.data.max_hp, ("   " + ", ".join(statuses)) if statuses else "",
+		me.movement_left, _box(me.has_action), _box(me.has_bonus), _box(me.has_reaction)]
 
-	var parts: Array[String] = []
-	for i in me.data.abilities.size():
-		var a: AbilityData = me.data.abilities[i]
-		var selected := _controller.mode == CombatController.Mode.TARGET and _controller.ability == a
-		var usable := state.can_use(me, a) and current == me
-		parts.append("%s%s %s%s%s" % [">" if selected else "", InputGlyphs.label(StringName("combat_ability_%d" % (i + 1))),
-			a.display_name, " (bonus)" if a.cost == AbilityData.Cost.BONUS else "", "" if usable else " -"])
-	parts.append("%s End turn" % InputGlyphs.label(&"combat_end_turn"))
-	_abilities.text = "   ".join(parts)
 	if current != me:
-		_abilities.text = "Enemy turn..."
-
-	var hovered := _controller.hovered_unit()
-	if hovered and hovered != me:
-		var text := "%s   %d/%d HP\nDefense %d%s" % [hovered.data.display_name, hovered.hp, hovered.data.max_hp,
-			hovered.defense(), _status_text(hovered)]
-		var p := _controller.prediction()
-		if p:
-			text += "\nHit %d%%   %d-%d dmg%s" % [roundi(p.chance * 100), p.damage.x, p.damage.y,
-				"   cover +2" if p.cover else ""]
-		_target.text = text
+		_abilities.text = "%s is acting..." % current.data.display_name
 	else:
-		_target.text = ""
+		var parts: Array[String] = []
+		for i in me.data.abilities.size():
+			var a: AbilityData = me.data.abilities[i]
+			var selected := _controller.mode == CombatController.Mode.TARGET and _controller.ability == a
+			parts.append("%s%s %s%s%s" % [">" if selected else "", InputGlyphs.label(StringName("combat_ability_%d" % (i + 1))),
+				a.display_name, " (bonus)" if a.cost == AbilityData.Cost.BONUS else "", "" if state.can_use(me, a) else " -"])
+		parts.append("%s End turn" % InputGlyphs.label(&"combat_end_turn"))
+		_abilities.text = "   ".join(parts)
+
+	_plan.text = _controller.plan_text()
+	_target.text = _controller.target_text()
 
 
 func _box(available: bool) -> String:
 	return "[x]" if available else "[ ]"
-
-
-func _status_text(unit: CombatUnit) -> String:
-	var names := unit.statuses.map(func(s: Dictionary) -> String: return "%s (%d)" % [s.status.display_name, s.turns_left])
-	return ("   " + ", ".join(names)) if names else ""

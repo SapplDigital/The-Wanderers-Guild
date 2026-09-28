@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EncounterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/data/encounter_data.gd" id="script"]
+[ext_resource type="Resource" path="res://data/actors/ruin_guardian.tres" id="e0"]
+[ext_resource type="Script" path="res://scripts/combat/data/actor_data.gd" id="e1"]
+
+[resource]
+script = ExtResource("script")
+id = &"broken_gate_guardian"
+enemies = Array[ExtResource("e1")]([ExtResource("e0")])
+enemy_offsets = Array[Vector3]([Vector3(0, 0, -2)])
+engage_message = "Moss slides off stone. The guardian of the gate turns its head toward you."
+victory_message = "The guardian settles back into the gateway and is only stone again."
+defeat_message = "You wake outside the gate. The guardian stands where it always stood."

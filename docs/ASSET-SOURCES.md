@@ -19,4 +19,7 @@ Every asset from an external tool or source. File | source | date | plan/license
 | `audio/sfx/combat_hit.ogg` | ElevenLabs Sound Effects (text-to-SFX via MCP), prompt: "single blunt impact hit on a leathery animal" | 2026-09-28 | **Plan unknown** (see above). | Placeholder, normalised, OGG. |
 | `audio/sfx/combat_miss.ogg` | ElevenLabs Sound Effects (text-to-SFX via MCP), prompt: "quick whoosh of a swing missing" | 2026-09-28 | **Plan unknown** (see above). | Placeholder, normalised, OGG. |
 
+| `audio/sfx/combat_reaction.ogg` | ElevenLabs Sound Effects (text-to-SFX via MCP), prompt: "short sharp warning sting, quick metallic ting with a snort" | 2026-09-28 | **Plan unknown** (see above). | Placeholder, normalised, OGG. |
+| `audio/ui/turn_start.ogg` | ElevenLabs Sound Effects (text-to-SFX via MCP), prompt: "soft single low wooden drum tap with a faint chime" | 2026-09-28 | **Plan unknown** (see above). | Placeholder, normalised, OGG. |
+| `audio/sfx/boar_down.ogg` | ElevenLabs Sound Effects (text-to-SFX via MCP), prompt: "wild boar short squeal then heavy body thud" | 2026-09-28 | **Plan unknown** (see above). | Placeholder, normalised, OGG. |
 All textures and meshes so far are procedural (Godot primitives + NoiseTexture2D); no external visual assets.

@@ -1,30 +1,37 @@
 class_name CombatUnit
 extends RefCounted
-## Runtime state of one combatant: HP, position, action economy, statuses.
+## Runtime state of one combatant: HP, world position, action economy, statuses.
 ## Player and enemies use the same class; ActorData holds the static definition.
 
 var data: ActorData
 var hp: int
-var cell: Vector2i
+var position: Vector3
 var initiative := 0
 
-var movement_left := 0
+var movement_left := 0.0 ## metres
 var has_action := false
 var has_bonus := false
 var has_reaction := false
 var provokes_reactions := true
 var statuses: Array = [] ## of {"status": StatusData, "turns_left": int}
+var brain_memory: Dictionary = {} ## AI-owned ephemeral state (telegraphs, goals); CombatState never interprets it
+var telegraph_radius := 0.0 ## public warning from a declared intent: danger reach around this unit; 0 = none
 
 
-func _init(actor: ActorData, start_cell: Vector2i) -> void:
+func _init(actor: ActorData, start: Vector3) -> void:
 	data = actor
 	hp = actor.max_hp
-	cell = start_cell
+	position = start
 	has_reaction = actor.reaction_ability != null # ready from the start of the fight
 
 
 var team: StringName:
 	get: return data.team
+
+
+## Radius of the area this unit threatens (its reaction reach); 0 if it has no reaction.
+var threat_radius: float:
+	get: return data.reaction_ability.range_max if data.reaction_ability else 0.0
 
 
 func is_alive() -> bool:

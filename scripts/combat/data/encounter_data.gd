@@ -1,10 +1,10 @@
 class_name EncounterData
 extends Resource
-## Who fights where. Cells are grid coordinates inside the arena.
+## Who fights where. Offsets are metres from the CombatArea's centre (y ignored; ground height is used).
 
 @export var id: StringName
 @export var enemies: Array[ActorData] = []
-@export var enemy_cells: Array[Vector2i] = []
-@export var player_cell := Vector2i.ZERO
+@export var enemy_offsets: Array[Vector3] = []
+@export var engage_message := "" ## first combat log line
 @export_multiline var victory_message := ""
 @export_multiline var defeat_message := ""

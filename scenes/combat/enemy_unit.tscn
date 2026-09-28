@@ -2,62 +2,134 @@
 
 [ext_resource type="Script" path="res://scripts/combat/unit_view.gd" id="1_view"]
 
-[sub_resource type="BoxMesh" id="body"]
-size = Vector3(0.8, 0.7, 1.2)
+[sub_resource type="SphereMesh" id="torso"]
+radius = 0.5
+height = 1.0
+radial_segments = 10
+rings = 5
 
-[sub_resource type="BoxMesh" id="head"]
-size = Vector3(0.55, 0.5, 0.5)
+[sub_resource type="SphereMesh" id="head"]
+radius = 0.3
+height = 0.55
+radial_segments = 8
+rings = 4
 
-[sub_resource type="BoxMesh" id="leg"]
-size = Vector3(0.18, 0.35, 0.18)
+[sub_resource type="CylinderMesh" id="snout"]
+top_radius = 0.1
+bottom_radius = 0.16
+height = 0.3
+radial_segments = 6
+rings = 1
 
-[sub_resource type="BoxMesh" id="tusk"]
-size = Vector3(0.07, 0.07, 0.3)
+[sub_resource type="CylinderMesh" id="leg"]
+top_radius = 0.08
+bottom_radius = 0.06
+height = 0.42
+radial_segments = 5
+rings = 1
+
+[sub_resource type="CylinderMesh" id="spine"]
+top_radius = 0.0
+bottom_radius = 0.07
+height = 0.34
+radial_segments = 4
+rings = 1
+
+[sub_resource type="CylinderMesh" id="tusk"]
+top_radius = 0.0
+bottom_radius = 0.035
+height = 0.26
+radial_segments = 4
+rings = 1
 
 [sub_resource type="StandardMaterial3D" id="bone"]
-albedo_color = Color(0.9, 0.86, 0.72, 1)
+albedo_color = Color(0.92, 0.86, 0.7, 1)
+
+[sub_resource type="StandardMaterial3D" id="eye"]
+shading_mode = 0
+albedo_color = Color(1, 0.75, 0.35, 1)
+
+[sub_resource type="BoxMesh" id="eye_mesh"]
+size = Vector3(0.06, 0.06, 0.04)
 
 [node name="EnemyUnit" type="Node3D"]
 script = ExtResource("1_view")
 
-[node name="Body" type="MeshInstance3D" parent="."]
-position = Vector3(0, 0.7, 0.05)
-mesh = SubResource("body")
+[node name="Body" type="Node3D" parent="."]
 
-[node name="Head" type="MeshInstance3D" parent="."]
-position = Vector3(0, 0.62, -0.75)
+[node name="Torso" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.95, 0, 0, 0, 0.72, 0, 0, 0, 1.35, 0, 0.66, 0.05)
+mesh = SubResource("torso")
+
+[node name="Head" type="Node3D" parent="Body"]
+position = Vector3(0, 0.72, -0.62)
+
+[node name="Skull" type="MeshInstance3D" parent="Body/Head"]
+position = Vector3(0, -0.05, -0.12)
 mesh = SubResource("head")
 
-[node name="LegFL" type="MeshInstance3D" parent="."]
-position = Vector3(-0.25, 0.18, -0.4)
-mesh = SubResource("leg")
+[node name="Snout" type="MeshInstance3D" parent="Body/Head"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, -0.12, -0.42)
+mesh = SubResource("snout")
 
-[node name="LegFR" type="MeshInstance3D" parent="."]
-position = Vector3(0.25, 0.18, -0.4)
-mesh = SubResource("leg")
-
-[node name="LegBL" type="MeshInstance3D" parent="."]
-position = Vector3(-0.25, 0.18, 0.45)
-mesh = SubResource("leg")
-
-[node name="LegBR" type="MeshInstance3D" parent="."]
-position = Vector3(0.25, 0.18, 0.45)
-mesh = SubResource("leg")
-
-[node name="Tusk" type="MeshInstance3D" parent="."]
-position = Vector3(-0.2, 0.5, -1.05)
-rotation_degrees = Vector3(-25, 0, 0)
+[node name="TuskL" type="MeshInstance3D" parent="Body/Head" groups=["keep_material"]]
+transform = Transform3D(1, 0, 0, 0, 0.5, -0.866, 0, 0.866, 0.5, -0.13, -0.16, -0.45)
 mesh = SubResource("tusk")
 surface_material_override/0 = SubResource("bone")
 
-[node name="Tusk2" type="MeshInstance3D" parent="."]
-position = Vector3(0.2, 0.5, -1.05)
-rotation_degrees = Vector3(-25, 0, 0)
+[node name="TuskR" type="MeshInstance3D" parent="Body/Head" groups=["keep_material"]]
+transform = Transform3D(1, 0, 0, 0, 0.5, -0.866, 0, 0.866, 0.5, 0.13, -0.16, -0.45)
 mesh = SubResource("tusk")
 surface_material_override/0 = SubResource("bone")
+
+[node name="EyeL" type="MeshInstance3D" parent="Body/Head" groups=["keep_material"]]
+position = Vector3(-0.16, 0.05, -0.33)
+mesh = SubResource("eye_mesh")
+surface_material_override/0 = SubResource("eye")
+
+[node name="EyeR" type="MeshInstance3D" parent="Body/Head" groups=["keep_material"]]
+position = Vector3(0.16, 0.05, -0.33)
+mesh = SubResource("eye_mesh")
+surface_material_override/0 = SubResource("eye")
+
+[node name="Spine1" type="MeshInstance3D" parent="Body" groups=["keep_material"]]
+transform = Transform3D(1, 0, 0, 0, 0.94, 0.342, 0, -0.342, 0.94, 0, 1.08, -0.4)
+mesh = SubResource("spine")
+surface_material_override/0 = SubResource("bone")
+
+[node name="Spine2" type="MeshInstance3D" parent="Body" groups=["keep_material"]]
+transform = Transform3D(1, 0, 0, 0, 0.94, 0.342, 0, -0.342, 0.94, 0, 1.13, -0.1)
+mesh = SubResource("spine")
+surface_material_override/0 = SubResource("bone")
+
+[node name="Spine3" type="MeshInstance3D" parent="Body" groups=["keep_material"]]
+transform = Transform3D(1, 0, 0, 0, 0.94, 0.342, 0, -0.342, 0.94, 0, 1.12, 0.2)
+mesh = SubResource("spine")
+surface_material_override/0 = SubResource("bone")
+
+[node name="Spine4" type="MeshInstance3D" parent="Body" groups=["keep_material"]]
+transform = Transform3D(1, 0, 0, 0, 0.94, 0.342, 0, -0.342, 0.94, 0, 1.04, 0.48)
+mesh = SubResource("spine")
+surface_material_override/0 = SubResource("bone")
+
+[node name="LegFL" type="MeshInstance3D" parent="Body"]
+position = Vector3(-0.28, 0.21, -0.38)
+mesh = SubResource("leg")
+
+[node name="LegFR" type="MeshInstance3D" parent="Body"]
+position = Vector3(0.28, 0.21, -0.38)
+mesh = SubResource("leg")
+
+[node name="LegBL" type="MeshInstance3D" parent="Body"]
+position = Vector3(-0.28, 0.21, 0.45)
+mesh = SubResource("leg")
+
+[node name="LegBR" type="MeshInstance3D" parent="Body"]
+position = Vector3(0.28, 0.21, 0.45)
+mesh = SubResource("leg")
 
 [node name="HP" type="Label3D" parent="."]
-position = Vector3(0, 1.45, 0)
+position = Vector3(0, 1.6, 0)
 billboard = 1
 no_depth_test = true
 fixed_size = true

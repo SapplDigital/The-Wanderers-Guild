@@ -23,5 +23,9 @@ static func label(action: StringName) -> String:
 		if using_pad and ev is InputEventJoypadButton:
 			return PAD_NAMES.get(ev.button_index, "Pad %d" % ev.button_index)
 		if not using_pad and ev is InputEventKey:
+			# Headless display servers cannot translate physical keys into the active
+			# keyboard layout. The configured physical label is still useful in tests.
+			if DisplayServer.get_name() == "headless":
+				return OS.get_keycode_string(ev.physical_keycode)
 			return OS.get_keycode_string(DisplayServer.keyboard_get_keycode_from_physical(ev.physical_keycode))
 	return "?"

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EncounterData" format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/data/encounter_data.gd" id="script"]
+[ext_resource type="Resource" path="res://data/actors/glimmer_midge.tres" id="e0"]
+[ext_resource type="Script" path="res://scripts/combat/data/actor_data.gd" id="e1"]
+
+[resource]
+script = ExtResource("script")
+id = &"forest_edge_midges"
+enemies = Array[ExtResource("e1")]([ExtResource("e0"), ExtResource("e0")])
+enemy_offsets = Array[Vector3]([Vector3(3, 0, -1.5), Vector3(-1.5, 0, -3.5)])
+engage_message = "The glimmer midges scatter behind the stones, spitting spores."
+victory_message = "The midges drift apart like sparks. The stones smell of mushrooms."
+defeat_message = "You wake among the ferns at the forest edge, sneezing glitter."

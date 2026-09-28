@@ -8,7 +8,7 @@
 script = ExtResource("script")
 id = &"clearing_boars"
 enemies = Array[ExtResource("e1")]([ExtResource("e0"), ExtResource("e0")])
-enemy_cells = Array[Vector2i]([Vector2i(8, 2), Vector2i(8, 5)])
-player_cell = Vector2i(1, 4)
-victory_message = "The boars crash off into the undergrowth, offended but alive."
+enemy_offsets = Array[Vector3]([Vector3(5.25, 0, -2.25), Vector3(5.25, 0, 2.25)])
+engage_message = "The boars notice you."
+victory_message ="The boars crash off into the undergrowth, offended but alive."
 defeat_message = "You wake at the edge of the clearing, bruised. Something has eaten your berries."

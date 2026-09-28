@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" path="res://scripts/combat/data/ability_data.gd" id="script"]
+[ext_resource type="Resource" path="res://data/statuses/dazzled.tres" id="dazzled"]
+
+[resource]
+script = ExtResource("script")
+id = &"spore_glob"
+display_name = "Spore Glob"
+description = "A glittering spore burst that stings from a distance and clouds the target's sight."
+cost = 0
+kind = 0
+range_min = 3.0
+range_max = 8.0
+needs_line_of_sight = true
+damage_die = 4
+damage_bonus = 1
+applies_status = ExtResource("dazzled")

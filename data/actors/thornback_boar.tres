@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/combat/data/actor_data.gd" id="script"]
 [ext_resource type="Resource" path="res://data/abilities/gore.tres" id="e0"]
 [ext_resource type="Script" path="res://scripts/combat/data/ability_data.gd" id="e1"]
+[ext_resource type="Script" path="res://scripts/combat/ai/melee_beast_brain.gd" id="brain"]
 
 [resource]
 script = ExtResource("script")
@@ -11,10 +12,11 @@ display_name = "Thornback Boar"
 team = &"enemy"
 max_hp = 9
 defense = 11
-movement = 4
+movement = 5.0
 attack_mod = 3
 initiative_mod = 1
 abilities = Array[ExtResource("e1")]([ExtResource("e0")])
 reaction_ability = ExtResource("e0")
 tint = Color(0.45, 0.33, 0.26, 1)
-ai_profile = &"basic"
+ai_profile = &"melee_beast"
+ai_brain = ExtResource("brain")
