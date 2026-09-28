@@ -230,6 +230,16 @@ loop = false
 unit_size = 6.0
 max_distance = 40.0
 
+[sub_resource type="Resource" id="reveal"]
+script = ExtResource("event")
+streams = Array[AudioStream]([ExtResource("s4")])
+bus = &"Music"
+volume_db = -6.0
+pitch_variance = 0.0
+loop = false
+unit_size = 6.0
+max_distance = 40.0
+
 [resource]
 script = ExtResource("bank")
-events = {&"amb_forest": SubResource("amb_forest"), &"amb_wind": SubResource("amb_wind"), &"amb_village": SubResource("amb_village"), &"amb_combat": SubResource("amb_combat"), &"wisp_hum": SubResource("wisp_hum"), &"shrine_hum": SubResource("shrine_hum"), &"well_hum": SubResource("well_hum"), &"interact": SubResource("interact"), &"shrine_awaken": SubResource("shrine_awaken"), &"step_grass": SubResource("step_grass"), &"step_dirt": SubResource("step_dirt"), &"step_wood": SubResource("step_wood"), &"step_mud": SubResource("step_mud"), &"step_water": SubResource("step_water"), &"combat_hit": SubResource("combat_hit"), &"combat_miss": SubResource("combat_miss"), &"reaction": SubResource("reaction"), &"enemy_down": SubResource("enemy_down"), &"turn_start": SubResource("turn_start"), &"ui_confirm": SubResource("ui_confirm"), &"discovery": SubResource("discovery")}
+events = {&"amb_forest": SubResource("amb_forest"), &"amb_wind": SubResource("amb_wind"), &"amb_village": SubResource("amb_village"), &"amb_combat": SubResource("amb_combat"), &"wisp_hum": SubResource("wisp_hum"), &"shrine_hum": SubResource("shrine_hum"), &"well_hum": SubResource("well_hum"), &"interact": SubResource("interact"), &"shrine_awaken": SubResource("shrine_awaken"), &"step_grass": SubResource("step_grass"), &"step_dirt": SubResource("step_dirt"), &"step_wood": SubResource("step_wood"), &"step_mud": SubResource("step_mud"), &"step_water": SubResource("step_water"), &"combat_hit": SubResource("combat_hit"), &"combat_miss": SubResource("combat_miss"), &"reaction": SubResource("reaction"), &"enemy_down": SubResource("enemy_down"), &"turn_start": SubResource("turn_start"), &"ui_confirm": SubResource("ui_confirm"), &"discovery": SubResource("discovery"), &"reveal": SubResource("reveal")}

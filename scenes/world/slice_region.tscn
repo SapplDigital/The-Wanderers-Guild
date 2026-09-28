@@ -2309,6 +2309,9 @@ position = Vector3(24, 11, -88)
 script = ExtResource("reveal")
 camera_rig = NodePath("../../CameraRig")
 focus = NodePath("../../Landmarks/FloatingIsland")
+focus_offset = Vector3(-114, -60, 22)
+location_id = "overlook"
+title = "The Overlook"
 
 [node name="Zone" type="CollisionShape3D" parent="Forest/OverlookReveal"]
 shape = SubResource("reveal_zone")
@@ -2318,15 +2321,6 @@ position = Vector3(-6, 5, 14)
 
 [node name="Lower" type="Marker3D" parent="Forest/OverlookReveal"]
 position = Vector3(4, 1, 6)
-
-[node name="OverlookZone" type="Area3D" parent="Forest"]
-position = Vector3(24.00, 10.00, -82.00)
-script = ExtResource("discovery")
-location_id = "overlook"
-title = "The Overlook"
-
-[node name="Shape" type="CollisionShape3D" parent="Forest/OverlookZone"]
-shape = SubResource("zone_m")
 
 [node name="AbandonedCamp" type="Node3D" parent="Forest"]
 

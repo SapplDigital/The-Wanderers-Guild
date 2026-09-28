@@ -90,6 +90,7 @@ func set_zoom(distance: float) -> void:
 ## fov <= 0 keeps the gameplay FOV.
 func play_cinematic(pose: Node3D, fov := 0.0) -> void:
 	_cinematic = pose
+	_orbiting = false # its release is ignored while cinematic: a held RMB would orbit forever after
 	_cinematic_fov = fov if fov > 0.0 else _base_fov
 
 

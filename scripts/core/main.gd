@@ -116,9 +116,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("debug_test_cinematic"):
 		_test_cinematic()
 	elif event.is_action_pressed("debug_reload_world"):
-		_reload_world()
+		if not _rig().is_cinematic:
+			_reload_world()
 	elif event.is_action_pressed("debug_start_combat"):
-		_debug_start_combat()
+		if not _rig().is_cinematic:
+			_debug_start_combat()
 	elif event.is_action_pressed("debug_trigger_event"):
 		get_tree().call_group("event_host", "debug_evaluate")
 	elif event.is_action_pressed("debug_win_combat"):
@@ -154,11 +156,12 @@ func _debug_start_combat() -> void:
 		areas[0].start()
 
 
-## Plays the first CinematicReveal in the world, wherever the player stands.
+## Replays the first CinematicReveal in the world, wherever the player stands, even after its
+## discovery. Debug only: writes no flag and leaves the trigger armed.
 func _test_cinematic() -> void:
 	var reveals := _world.find_children("*", "CinematicReveal")
 	if reveals and not _rig().is_cinematic:
-		reveals[0].play(_world.get_node("Player"))
+		reveals[0].play(_world.get_node("Player"), false)
 
 
 ## `godot -- [--world=res://...tscn] --shot=C:/abs/shot.png [--save-file=C:/abs/save.cfg] [--load] [--overlay] [--flags=a,b] [--pad] [--interact] [--actions=name@frame,...] [--seed=N] [--then=x,y,z] [--pos=x,y,z] [--yaw=90] [--pitch=10 (offset)] [--zoom=14] [--scale=3] [--post=0] [--walk] [--reveal] [--frames=90]`

@@ -13,7 +13,7 @@ func _ready() -> void:
 	# Every event referenced by scene data or code must exist in the bank (catches typos).
 	var world := REGION.instantiate()
 	add_child(world)
-	var used := {&"ui_confirm": true, &"discovery": true, &"step_grass": true, &"step_dirt": true, &"step_wood": true}
+	var used := {&"ui_confirm": true, &"discovery": true, &"reveal": true, &"step_grass": true, &"step_dirt": true, &"step_wood": true}
 	for node in world.find_children("*", "SoundEmitter", true, false):
 		used[node.event] = true
 	for node in world.find_children("*", "AmbienceZone", true, false):
