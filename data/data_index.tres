@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DataIndex" format=3]
+
+[ext_resource type="Script" path="res://scripts/core/data_index.gd" id="1_index"]
+[ext_resource type="Script" path="res://scripts/quests/data/quest_data.gd" id="quest"]
+[ext_resource type="Script" path="res://scripts/events/data/event_data.gd" id="event"]
+[ext_resource type="Resource" path="res://data/quests/common_room.tres" id="q_common_room"]
+[ext_resource type="Resource" path="res://data/quests/missing_ring.tres" id="q_missing_ring"]
+[ext_resource type="Resource" path="res://data/events/berries_regrow.tres" id="e_berries_regrow"]
+[ext_resource type="Resource" path="res://data/events/glowing_fish.tres" id="e_glowing_fish"]
+
+[resource]
+script = ExtResource("1_index")
+quests = Array[ExtResource("quest")]([ExtResource("q_common_room"), ExtResource("q_missing_ring")])
+events = Array[ExtResource("event")]([ExtResource("e_berries_regrow"), ExtResource("e_glowing_fish")])

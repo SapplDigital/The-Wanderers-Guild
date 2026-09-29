@@ -30,6 +30,9 @@ func _ready() -> void:
 
 ## The rules must not secretly depend on cells: no Vector2i / "cell" anywhere in the combat code.
 func _test_no_grid_left() -> void:
+	if not FileAccess.file_exists("res://project.godot"):
+		print("SKIP: no grid remnants (an exported pack ships compiled scripts, not source)")
+		return
 	var files: Array[String] = []
 	for dir in [COMBAT_SCRIPTS, COMBAT_SCRIPTS + "ai/", COMBAT_SCRIPTS + "data/"]:
 		for f in DirAccess.get_files_at(dir):

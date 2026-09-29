@@ -339,9 +339,6 @@ mesh = SubResource("plaza_mesh")
 [node name="GuildHall" parent="Village" instance=ExtResource("guild_hall")]
 position = Vector3(-17, 0, 0)
 
-[node name="Interior" parent="Village/GuildHall" node_paths=PackedStringArray("camera_rig")]
-camera_rig = NodePath("../../../CameraRig")
-
 [node name="GuildDoor" type="Marker3D" parent="Village"]
 position = Vector3(-12, 0, 0)
 
@@ -412,19 +409,13 @@ shape = SubResource("reach_m")
 [node name="WellKeeper" parent="Village" instance=ExtResource("villager")]
 position = Vector3(-1.7, 0, 1.5)
 rotation_degrees = Vector3(0, -60, 0)
-
-[node name="Dialogue" parent="Village/WellKeeper"]
 dialogue = ExtResource("dlg_well")
 
 [node name="RingOwner" parent="Village" instance=ExtResource("villager")]
 position = Vector3(-5.5, 0, 3.6)
 rotation_degrees = Vector3(0, -120, 0)
-
-[node name="Body" parent="Village/RingOwner/Visual"]
-surface_material_override/0 = ExtResource("owner_cloth")
-
-[node name="Dialogue" parent="Village/RingOwner"]
 dialogue = ExtResource("dlg_owner")
+body_material = ExtResource("owner_cloth")
 
 [node name="RingReturnedLamp" type="Node3D" parent="Village"]
 script = ExtResource("toggle")

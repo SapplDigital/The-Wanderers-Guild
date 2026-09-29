@@ -9,6 +9,8 @@ extends Node3D
 
 enum State { NORMAL, LOOK, CINEMATIC }
 
+const GROUP := &"camera_rig" ## set in camera_rig.tscn, so it's there before anyone's _ready
+
 @export var target: Node3D
 @export_group("Follow")
 @export var follow_sharpness := 8.0
@@ -79,6 +81,11 @@ func _ready() -> void:
 ## walls and roof would otherwise pull the camera down into the room.
 func set_collision_enabled(on: bool) -> void:
 	_arm.collision_mask = _arm_mask if on else 0
+
+
+## Where the camera sits when nothing pulls the spring arm in (for occlusion checks).
+func ideal_camera_position() -> Vector3:
+	return _arm.global_position + _arm.global_basis.z * _arm.spring_length
 
 
 func set_zoom(distance: float) -> void:

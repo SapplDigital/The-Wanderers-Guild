@@ -4,7 +4,6 @@ extends Node
 ## entering a different EventRegion than last time, at a safe moment (not in combat, dialogue or
 ## a cinematic). Unsafe entries are skipped, not queued. The decision itself is EventDirector's.
 
-const EVENT_DIR := "res://data/events/"
 const LAST_REGION := "event.director.last_region"
 
 @export var player: Player
@@ -15,9 +14,7 @@ var _events: Array[EventData] = []
 
 func _ready() -> void:
 	add_to_group("event_host")
-	for file in DirAccess.get_files_at(EVENT_DIR):
-		if file.ends_with(".tres"):
-			_events.append(load(EVENT_DIR + file))
+	_events = DataIndex.main().events
 	if GameState.get_flag(EventDirector.SEED) == null:
 		GameState.set_flag(EventDirector.SEED, randi())
 

@@ -105,8 +105,7 @@ func _test_in_world() -> void:
 	_check(not cutaway.visible and arm.collision_mask == 0 and zone.inside, "a new game starts inside the common room, cut away")
 	var hearth: Interactable = hall.get_node("HearthUse")
 	_check((player.get_node("Interactor") as Interactor).focus == hearth, "...with the hearth in reach (the first prompt)")
-	player.global_position = outside
-	await _physics(4)
+	await _teleport(player, rig, outside)
 	_check(cutaway.visible and arm.collision_mask == 1 and not zone.inside, "outside: roof shown, camera collides")
 	_check((hall.get_node("Damaged") as Node3D).visible and not (hall.get_node("Repaired") as Node3D).visible,
 		"before the repair the room is damaged")
@@ -128,11 +127,31 @@ func _test_in_world() -> void:
 	_check(_surface_at(world, player.global_position) == "wood", "the guild floor sounds like wood")
 	hit = player.move_and_collide(Vector3(-8, 0, 0))
 	_check(hit != null and player.global_position.x > hall.global_position.x - 4.4, "the west wall stops the player (collision stays while cut away)")
-	player.global_position = outside + Vector3(0, 0, 2.5)
-	await _physics(4)
+	await _teleport(player, rig, outside + Vector3(0, 0, 2.5))
 	_check(not zone.inside and cutaway.visible and arm.collision_mask == 1, "outside again: roof back, camera collides again")
 	hit = player.move_and_collide(Vector3(-4, 0, 0))
 	_check(hit != null and player.global_position.x > hall.global_position.x + 4.6, "the east wall beside the door blocks")
+
+	# Doorstep (M15): with the camera behind the hall, the roof opens instead of catching the arm.
+	_check(zone.occluder == hall, "the interior knows its building (doorstep occlusion)")
+	await _teleport(player, rig, hall.global_position + Vector3(6.5, 0, 0))
+	for yaw in [270.0, 90.0]:
+		rig._yaw_goal = deg_to_rad(yaw)
+		rig.rotation.y = deg_to_rad(yaw)
+		await _physics(30) # past InteriorZone.doorstep_hold
+		var arm_len := rig.camera.global_position.distance_to(arm.global_position)
+		if yaw == 270.0:
+			_check(not cutaway.visible and arm.collision_mask == 0 and arm_len > arm.spring_length - 1.0,
+				"doorstep, camera behind the hall: roof opens, camera keeps its distance (%.1f of %.1f m)" % [arm_len, arm.spring_length])
+		else:
+			_check(cutaway.visible and arm.collision_mask == 1, "doorstep, camera in front: roof intact, camera collides")
+	await _teleport(player, rig, hall.global_position + Vector3(20, 0, 0))
+	rig._yaw_goal = deg_to_rad(270.0)
+	rig.rotation.y = deg_to_rad(270.0)
+	await _physics(30)
+	_check(cutaway.visible and arm.collision_mask == 1, "away from the hall the check doesn't run: roof intact")
+	rig._yaw_goal = 0.0
+	rig.rotation.y = 0.0
 	_check(GameState.get_flag(EventDirector.OPPORTUNITY) == opportunity and GameState.get_flag(EventHost.LAST_REGION) == "village",
 		"walking in and out of the guild is not an event opportunity")
 
@@ -167,8 +186,7 @@ func _test_in_world() -> void:
 		"after a reload inside, the room is cut away straight away")
 	_check((hall.get_node("Repaired") as Node3D).visible and not (hall.get_node("Damaged") as Node3D).visible,
 		"the repair survives the reload")
-	world.get_node("Player").global_position = outside
-	await _physics(4)
+	await _teleport(world.get_node("Player"), world.get_node("CameraRig"), outside)
 	_check((hall.get_node("Cutaway/LitWindows") as Node3D).is_visible_in_tree(), "outside, the windows glow")
 	_check(GameState.get_flag(EventDirector.OPPORTUNITY) == opportunity, "reloading in the guild is not an event opportunity")
 	world.free()
@@ -187,6 +205,14 @@ func _load_world(player_at: Variant = null) -> Node3D:
 	add_child(world)
 	await _physics(3)
 	return world
+
+
+## Moves the player and snaps the camera rig along (it otherwise trails a teleport for a few
+## frames, and the doorstep check would see a camera still behind the hall).
+func _teleport(player: Node3D, rig: Node3D, at: Vector3) -> void:
+	player.global_position = at
+	rig.global_position = at
+	await _physics(4)
 
 
 ## Area overlaps are reported a physics step after a move, so give it a few.

@@ -381,15 +381,9 @@ omni_range = 9.0
 [node name="Lodger" parent="Repaired" instance=ExtResource("villager")]
 position = Vector3(-0.8, 0, 0.4)
 rotation_degrees = Vector3(0, -90, 0)
-
-[node name="Body" parent="Repaired/Lodger/Visual"]
-surface_material_override/0 = ExtResource("cloak")
-
-[node name="Bucket" parent="Repaired/Lodger/Visual"]
-visible = false
-
-[node name="Dialogue" parent="Repaired/Lodger"]
 dialogue = ExtResource("dlg_lodger")
+body_material = ExtResource("cloak")
+show_bucket = false
 
 [node name="HearthUse" type="Area3D" parent="."]
 position = Vector3(-1.5, 0, -2.7)
@@ -405,10 +399,11 @@ script = ExtResource("trigger")
 dialogue = ExtResource("dlg_hearth")
 interactable = NodePath("..")
 
-[node name="Interior" type="Area3D" parent="." node_paths=PackedStringArray("cutaway")]
+[node name="Interior" type="Area3D" parent="." node_paths=PackedStringArray("cutaway", "occluder")]
 position = Vector3(0, 1.5, 0)
 script = ExtResource("interior")
 cutaway = NodePath("../Cutaway")
+occluder = NodePath("..")
 
 [node name="Shape" type="CollisionShape3D" parent="Interior"]
 shape = SubResource("room")

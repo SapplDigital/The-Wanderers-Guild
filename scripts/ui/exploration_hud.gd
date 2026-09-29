@@ -8,7 +8,6 @@ extends CanvasLayer
 const HP_PER_PIP := 2
 const PIP_FULL := Color(0.95, 0.62, 0.36)
 const PIP_EMPTY := Color(0.2, 0.18, 0.22, 0.8)
-const QUEST_DIR := "res://data/quests/"
 
 @onready var _root: Control = $Root
 @onready var _pips: HBoxContainer = $Root/Pips
@@ -34,9 +33,7 @@ func _ready() -> void:
 	_location.modulate.a = 0.0
 	_message.modulate.a = 0.0
 	_update.modulate.a = 0.0
-	for file in DirAccess.get_files_at(QUEST_DIR):
-		if file.ends_with(".tres"):
-			_quests.append(load(QUEST_DIR + file))
+	_quests = DataIndex.main().quests
 	GameState.flag_changed.connect(func(_k: String, _v: Variant) -> void: _refresh_quests(true))
 	_refresh_quests(false)
 

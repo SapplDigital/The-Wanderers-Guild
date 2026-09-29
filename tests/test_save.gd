@@ -25,6 +25,7 @@ func _ready() -> void:
 	_test_logic()
 	await _test_world()
 	await _test_end_to_end()
+	await _test_title()
 	_remove(PATH)
 	GameState.flags = {}
 	print("save: %s (%d failures)" % ["OK" if _failures == 0 else "FAILED", _failures])
@@ -102,10 +103,7 @@ func _test_format() -> void:
 ## Same flags in, same decisions out, before and after a round trip (JSON would fail this: the
 ## director's gap and cooldown checks need ints).
 func _test_logic() -> void:
-	var events: Array[EventData] = []
-	for file in DirAccess.get_files_at("res://data/events/"):
-		if file.ends_with(".tres"):
-			events.append(load("res://data/events/" + file))
+	var events := DataIndex.main().events # the game's own list (folder scans find nothing in exported packs)
 	var start := {EventDirector.SEED: 1, "discovered.abandoned_camp": true, "world.berries_picked": true}
 	var a := Flags.new(start.duplicate())
 	var b := Flags.new(start.duplicate())
@@ -272,7 +270,89 @@ func _test_end_to_end() -> void:
 	await get_tree().process_frame
 
 
-# --- helpers ---------------------------------------------------------------------------------
+## M15 start screen: Continue only with a loadable save; New Game over a save file asks first,
+## and neither choosing, cancelling nor confirming writes the save; nothing saves while it's open.
+func _test_title() -> void:
+	_remove(PATH)
+	GameState.flags = {"stale.flag": true}
+	var main := await _boot()
+	var title: TitleMenu = main._title
+	main.show_title()
+	await _physics(12)
+	_check(title.is_open() and title.rows() == [TitleMenu.NEW_GAME], "title without a save offers only New Game")
+	_check(main._world.process_mode == Node.PROCESS_MODE_DISABLED and not _player(main).input_enabled, "title: the backdrop world is frozen, the player has no input")
+	_check(not main.save_game() and not FileAccess.file_exists(PATH), "title: saving is refused while it's open")
+	title.pick(TitleMenu.NEW_GAME)
+	await _physics(3)
+	_check(not title.is_open() and _player(main).input_enabled, "New Game without a save starts straight away")
+	_check(not GameState.is_set("stale.flag") and _player(main).global_position.distance_to(Vector3(-16.8, 0, -1)) < 0.5, "New Game: empty flags, new-game spawn at the hearth")
+	_check(not FileAccess.file_exists(PATH), "New Game doesn't write a save by itself")
+	_check(main.save_game(), "after New Game, F9 saves again")
+	var before := FileAccess.get_file_as_bytes(PATH)
+	GameState.set_flag("after.save")
+
+	main.show_title()
+	await _physics(12)
+	_check(title.rows() == [TitleMenu.CONTINUE, TitleMenu.NEW_GAME], "with a save: Continue, then New Game")
+	# Gamepad through the real input pipeline: D-pad down, A, B; left stick up.
+	await _pad_button(JOY_BUTTON_DPAD_DOWN)
+	_check(title._selected == 1, "pad: D-pad down moves to New Game")
+	await _pad_button(JOY_BUTTON_A)
+	_check(title.rows() == [TitleMenu.BACK, TitleMenu.CONFIRM_NEW] and title._selected == 0, "pad: A on New Game opens the question, Back selected")
+	await _pad_button(JOY_BUTTON_B)
+	_check(title.rows() == [TitleMenu.CONTINUE, TitleMenu.NEW_GAME], "pad: B goes back")
+	await _pad_button(JOY_BUTTON_DPAD_DOWN)
+	await _pad_stick(-1.0)
+	_check(title._selected == 0 and FileAccess.get_file_as_bytes(PATH) == before, "pad: left stick up selects Continue; the save is untouched")
+	title.pick(TitleMenu.NEW_GAME)
+	_check(title.is_open() and title.rows() == [TitleMenu.BACK, TitleMenu.CONFIRM_NEW], "New Game over a save asks first, Back preselected")
+	title.pick(TitleMenu.BACK)
+	_check(title.rows() == [TitleMenu.CONTINUE, TitleMenu.NEW_GAME] and FileAccess.get_file_as_bytes(PATH) == before, "Back returns to the menu, save untouched")
+	title.pick(TitleMenu.NEW_GAME)
+	title.pick(TitleMenu.CONFIRM_NEW)
+	await _physics(3)
+	_check(not title.is_open() and not GameState.is_set("after.save"), "confirmed New Game starts with empty flags")
+	_check(FileAccess.get_file_as_bytes(PATH) == before, "confirmed New Game leaves the file until the next save")
+
+	GameState.set_flag("unsaved.flag")
+	main.show_title()
+	await _physics(12)
+	title.pick(TitleMenu.CONTINUE)
+	await _physics(3)
+	_check(not title.is_open() and not GameState.is_set("unsaved.flag") and _player(main).input_enabled, "Continue loads the save")
+
+	_write_text("not a save")
+	main.show_title()
+	await _physics(12)
+	_check(title.rows() == [TitleMenu.NEW_GAME] and title._note.visible, "an unloadable save: no Continue, a note says why")
+	title.pick(TitleMenu.NEW_GAME)
+	_check(title.rows() == [TitleMenu.BACK, TitleMenu.CONFIRM_NEW], "New Game still asks before replacing the broken file")
+	title.pick(TitleMenu.BACK)
+	title.close()
+	main.queue_free()
+	await get_tree().process_frame
+
+
+# --- helpers ---
+
+func _pad_button(button: JoyButton) -> void:
+	for pressed in [true, false]:
+		var e := InputEventJoypadButton.new()
+		e.button_index = button
+		e.pressed = pressed
+		Input.parse_input_event(e)
+		await get_tree().process_frame
+		await get_tree().process_frame
+
+
+func _pad_stick(value: float) -> void:
+	for v in [value, 0.0]:
+		var e := InputEventJoypadMotion.new()
+		e.axis = JOY_AXIS_LEFT_Y
+		e.axis_value = v
+		Input.parse_input_event(e)
+		await get_tree().process_frame
+		await get_tree().process_frame
 
 func _boot() -> Node:
 	var main := MAIN.instantiate()

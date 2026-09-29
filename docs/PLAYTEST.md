@@ -6,13 +6,19 @@ game, write that down as a finding.
 
 ## Launch
 
-The slice runs from the Godot 4.7.2 editor build (there is no exported release build yet).
+**External playtesters get the exported release build** (no developer keys, no Godot needed):
+run `tools\package_playtest.ps1`; it exports `export/windows/WanderersGuild.exe`, adds
+`docs/playtest/README.txt` (the tester's only instructions) and `docs/playtest/FEEDBACK.txt`, and zips
+all three into `export/playtest/`. Every tester gets the same zip. Needs the Godot 4.7.2 mono Windows
+export templates installed.
+
+For development the slice also runs from the Godot 4.7.2 editor build:
 
 - Editor: open the project folder in Godot 4.7.2 and press F5 (Run Project).
 - Command line:
   `C:\Tools\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe --path "<project folder>"`
 
-Because this is a debug build, the developer keys below work. Playtesters should leave them alone.
+In debug builds the developer keys below work. Playtesters should leave them alone.
 
 ## Controls
 
@@ -35,14 +41,16 @@ Health (the orange pips, top left) comes back slowly while you explore.
 
 - One save slot. **F9** saves (all builds); it says "Saved." or "Can't save right now." Saving is refused in a fight, a conversation or a cinematic.
 - **Closing the window autosaves** if you're at a safe moment (otherwise the last save stays).
-- **Launching continues from the save** automatically. There is no title screen.
+- **Launching opens the title screen**: Continue (only when the save loads) and New Game. New Game over
+  an existing save asks first; even then the old save is only replaced by the next F9 or close.
+  Nothing saves while the title screen is open.
 - Gamepad players have no save button; the autosave on close covers them.
 - Save file: `%APPDATA%\Godot\app_userdata\The Wanderer's Guild\save.cfg`
 
 ## Starting fresh
 
-Either delete `save.cfg` (path above), or launch once with `-- --fresh` (it ignores the save; note that
-the next F9 or window close then overwrites the old save):
+Choose New Game on the title screen. For developers, `-- --fresh` skips the title straight into a new
+game (the next F9 or window close then overwrites the old save):
 
 `...console.exe --path "<project folder>" -- --fresh`
 
@@ -70,7 +78,7 @@ Headless, exit code 0 = pass:
 `godot --headless --path . res://tests/<name>.tscn`
 
 `test_exploration_loop`, `test_audio`, `test_combat_rules`, `test_combat_world`, `test_dialogue`,
-`test_quest`, `test_events`, `test_guild`, `test_save`, `test_reveal`.
+`test_quest`, `test_events`, `test_guild`, `test_save`, `test_reveal`, `test_data_index`.
 
 Scripted screenshots: see the `--shot` line in `CLAUDE.md`.
 

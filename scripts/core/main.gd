@@ -12,6 +12,7 @@ var _autosave := true ## on quit; off for scripted shot runs
 @onready var _world: Node3D = $PixelView/SubViewport/World
 @onready var _debug_label: Label = $DebugHUD/Label
 @onready var _hud: CanvasLayer = $PixelView/SubViewport/ExplorationHUD
+@onready var _title: TitleMenu = $PixelView/SubViewport/TitleMenu
 
 
 func _ready() -> void:
@@ -24,12 +25,14 @@ func _ready() -> void:
 		if args.has("world"):
 			_swap_world(args.world)
 	_hud.bind(_world)
-	# Continue from the save on launch. Shot runs, test worlds and tests (main isn't the current
-	# scene there) never pick up a developer's save unless asked with --load.
+	_title.chosen.connect(_on_title_chosen)
+	# A normal launch opens the title screen (Continue / New Game). Shot runs, test worlds and
+	# tests (main isn't the current scene there) never show it and never pick up a developer's
+	# save unless asked with --load; --fresh skips the title straight into a new game.
 	if args.has("load") and OS.is_debug_build():
 		load_game()
-	elif get_tree().current_scene == self and not (args.has("fresh") or args.has("shot") or args.has("world")):
-		load_game(false)
+	elif (get_tree().current_scene == self and not (args.has("fresh") or args.has("shot") or args.has("world"))) 			or (args.has("title") and OS.is_debug_build()): # --title: shot runs of the start screen
+		show_title()
 	_autosave = not args.has("shot")
 	_handle_cli_screenshot(args)
 
@@ -68,9 +71,45 @@ func _reload_world() -> void:
 	_swap_world(_world.scene_file_path)
 
 
-## Saves GameState.flags + the player (see SaveGame). Refused outside the main world and while
-## the player is busy (combat, dialogue, cinematic: the same rule as EventHost.is_safe).
+## The title screen over the world as a backdrop. The player has no input (so no event, regen or
+## interaction), and after a few frames, once the camera and the interior cutaway have settled,
+## the world is frozen. It is thrown away either way: both choices rebuild it. The save is only
+## read here, never written.
+func show_title() -> void:
+	var data := SaveGame.read(save_path)
+	var exists := FileAccess.file_exists(save_path)
+	var note := "" if data.ok or not exists else "The saved game can't be loaded (%s)." % data.error
+	(_world.get_node("Player") as Player).input_enabled = false
+	_hud.visible = false
+	_title.open(data.ok, exists, note)
+	var backdrop := _world
+	for i in 10:
+		await get_tree().physics_frame
+	if is_instance_valid(backdrop) and _title.is_open():
+		backdrop.process_mode = Node.PROCESS_MODE_DISABLED
+
+
+## Continue = the normal load; New Game = empty flags + a fresh world at the new-game spawn.
+## Both wait one frame so the confirming key press can't also reach the new world.
+func _on_title_chosen(action: StringName) -> void:
+	await get_tree().process_frame
+	if action == TitleMenu.CONTINUE:
+		if not load_game():
+			show_title() # the save went bad since the title opened: say so, stay here
+			return
+	else:
+		GameState.flags = {}
+		_swap_world(MAIN_WORLD)
+	_title.close()
+	_hud.visible = true
+
+
+## Saves GameState.flags + the player (see SaveGame). Refused on the title screen, outside the
+## main world and while the player is busy (combat, dialogue, cinematic: the same rule as
+## EventHost.is_safe).
 func save_game() -> bool:
+	if _title.is_open():
+		return false
 	var player: Player = _world.get_node("Player")
 	if _world.scene_file_path != MAIN_WORLD or not player.input_enabled or _rig().state == CameraController.State.CINEMATIC:
 		return false
@@ -97,6 +136,8 @@ func _notification(what: int) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _title.is_open():
+		return # no save, load or debug key before the player has chosen
 	if event.is_action_pressed("quicksave"):
 		_hud.show_message("Saved." if save_game() else "Can't save right now.")
 	if not OS.is_debug_build():
@@ -170,7 +211,7 @@ func _test_cinematic() -> void:
 		reveals[0].play(_world.get_node("Player"), false)
 
 
-## `godot -- [--world=res://...tscn] --shot=C:/abs/shot.png [--save-file=C:/abs/save.cfg] [--load] [--overlay] [--flags=a,b] [--pad] [--interact] [--actions=name@frame,...] [--seed=N] [--then=x,y,z] [--pos=x,y,z] [--yaw=90] [--pitch=10 (offset)] [--zoom=14] [--scale=3] [--post=0] [--walk] [--reveal] [--frames=90]`
+## `godot -- [--world=res://...tscn] --shot=C:/abs/shot.png [--save-file=C:/abs/save.cfg] [--load] [--title] [--perf[=frames]] [--stress=3] [--overlay] [--flags=a,b] [--pad] [--interact] [--actions=name@frame,...] [--seed=N] [--then=x,y,z] [--pos=x,y,z] [--yaw=90] [--pitch=10 (offset)] [--zoom=14] [--scale=3] [--post=0] [--walk] [--reveal] [--frames=90]`
 ## renders N frames, saves the PNG and quits. --seed also seeds the world event director. --interact sends a real "interact" input event at frame 45;
 ## --then reloads the world afterwards (leave + return) and puts the player at that position.
 func _handle_cli_screenshot(args: Dictionary) -> void:
@@ -203,6 +244,8 @@ func _handle_cli_screenshot(args: Dictionary) -> void:
 		for combat_area in _world.find_children("*", "CombatArea"):
 			combat_area.rng_seed = int(args.seed)
 		GameState.set_flag(EventDirector.SEED, int(args.seed))
+	if args.has("stress"):
+		print("stress: added %d forest mesh copies" % PerfProbe.stress(_world.get_node("Forest"), int(args.stress)))
 	for key in (args.get("flags", "") as String).split(",", false):
 		GameState.set_flag(key)
 	_debug_label.visible = args.has("overlay")
@@ -228,6 +271,9 @@ func _handle_cli_screenshot(args: Dictionary) -> void:
 			var t: PackedFloat64Array = (args.then as String).split_floats(",")
 			_world.get_node("Player").global_position = Vector3(t[0], t[1], t[2])
 			_rig().global_position = Vector3(t[0], t[1], t[2])
+	if args.has("perf"):
+		var sub: Viewport = _pixel_view.get_node("SubViewport")
+		print(await PerfProbe.measure(get_tree(), sub, int(args.perf) if args.perf != "" else 300))
 	var shot_texture := get_viewport().get_texture() if DisplayServer.get_name() != "headless" else null
 	var shot_image := shot_texture.get_image() if shot_texture else null
 	if shot_image:

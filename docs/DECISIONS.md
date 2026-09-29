@@ -186,3 +186,48 @@ A temporary autopilot (deleted after the run) played a fresh game in the real ma
 - **Quest corner:** 250 px wide instead of 192 (no objective wraps any more), a blank line between quests so each title stays with its objective, and the common room's last objective no longer echoes the title ("Bring the boards and the coal to the hearth."). Still one Label, no journal.
 - **East edge:** 13 more edge trees (existing tree prop) on the wall line in loose clusters in front of the rise, where the forest stops short of the wall. Wall, layout and landmarks unchanged; the four edges stop the player at the same coordinates as before.
 - **Traversal snags:** only the two real pinch points on designed routes were moved: `Tree190` (with `Tree23` it left a ~0.8 m gap right on the path -> camp line; moved 2.5 m aside) and `Tree62` (on the trail-stone line to the Hidden Hollow, inside the gap between Tree315/316; moved 2.5 m aside). Other autopilot bumps were single trees (neighbours 3 m+ away) on straight off-trail lines, or the midge fight's cover rock; left as they are. Re-walk: 0 stuck events on village -> camp (was 1), camp <-> hollow, path -> clearing, village -> overlook, crest -> forest edge, forest edge -> gate.
+
+## M15 Playtest build + validation (2026-09-29)
+
+Validation milestone, no new gameplay. Plan: `POST_M14_PRODUCTION_PLAN.md`.
+
+- **Title screen** (`TitleMenu`, `scripts/ui/title_menu.gd`, in the pixel viewport, same look and controls as the dialogue panel). A normal launch shows it instead of continuing automatically. Continue appears only when `SaveGame.read` succeeds; a broken file shows a note and no Continue. New Game over any existing save file asks first ("Back" preselected); confirming still writes nothing, so the old save is replaced only at the next F9 or autosave on close. This keeps the one-slot semantics, and a stranger can't lose a save by pressing A twice. Behind the title the world runs 10 physics frames with player input off (camera and interior cutaway settle), then it is frozen (`PROCESS_MODE_DISABLED`); both choices rebuild it. Saving and all debug keys are refused while the title is open. `--fresh` skips the title into a new game; `--title` shows it in shot runs.
+- **Gamepad:** the title uses the dialogue panel's actions (`ui_up/down` + `move_forward/back` for the stick, `interact`/`ui_accept` = A, `dialogue_leave`/`ui_cancel` = B). Verified with synthetic joypad events through `Input.parse_input_event` in `test_save`. No physical pad was available: the real-pad check is open for the human playtest.
+- **Guild doorstep occlusion.** Reproduced first: with the camera behind the hall (yaw 270, player on the doorstep), the spring arm hit the roof collision and slammed into a close-up of the player's back. The fix extends `InteriorZone`; there is no general occlusion system. Within 10 m of the room, if the building's own body (`occluder`) blocks the ray from the player's head to `CameraController.ideal_camera_position()` (the full-length arm end), the same two interior effects apply: cutaway hidden, arm collision off. A 0.3 s hold prevents flicker. Entering the room clears the hold, because the first frames after a load run before the overlap is reported. From every other side the roof stays intact.
+- **DataIndex** (`scripts/core/data_index.gd`, `data/data_index.tres`). The only runtime folder scans were the HUD's quest list and `EventHost`'s events. The export log confirms why they had to go: in the pack every resource is a `.remap`. Both now read the explicit index. `validate()` reports missing entries and duplicate ids. Event order stays sorted by id (the director's weighted pick depends on it). `test_data_index` checks that folders and index match, that no game script scans `res://`, and that no scene overrides children of instanced scenes (see below).
+- **Export:** `export_presets.cfg` has "Windows Playtest" (release, one exe with the pack embedded; tests/tools/docs excluded) and "Windows Smoke (debug, with tests)". Templates are the official 4.7.2 mono ones from the Godot GitHub release. Only the Windows x64 files were fetched (ranged reads of the official `.tpz`; zip CRCs verified on extraction). Exported binaries refuse a scene path, so the suites run as `godot --headless --main-pack <smoke exe> res://tests/<name>.tscn` from a folder without a project.
+- **Export-only bug found and fixed (the reason the smoke gate exists).** Properties that an outer scene set on a *child of an instanced scene* were dropped in the exported build; the editor kept them. `slice_region.tscn` set `InteriorZone.camera_rig` on `Village/GuildHall/Interior`, so in exports the camera collided inside the guild. Every villager's `Dialogue.dialogue` (plus body material and bucket) was set the same way, so in exports Wenna, Hollis and Maren could not be talked to. The first run of the suites against the pack failed 7 suites; after the fix all 11 pass in the pack and in the editor. The fix: `InteriorZone` finds the rig through the `camera_rig` group (declared in `camera_rig.tscn`), and `villager.tscn` got a root script (`Villager`: `dialogue`, `body_material`, `show_bucket`), so each NPC is configured on the instance root, which survives export. I did not establish the engine-level cause. Hand-written overrides lack the `index` attribute the editor writes, which may be why (unverified). The rule is now a test.
+- **Release smoke test** (real keyboard input via scancodes + window screenshots, `export/windows/WanderersGuild.exe`):
+  - fresh launch → title (New Game only) → New Game → cold common room with "F Inspect the hearth" → the hearth conversation accepts the repair quest → F9 → close (autosave) → relaunch → Continue at the saved spot, with the quest line
+  - Hollis in his green cloak → conversation → The Missing Ring accepted
+  - late state (flags written by the debug export, not played; the played routes are covered by the pack suites): Continue on the path below the overlook → walk up → the reveal glides, holds the gate + island, "The Overlook" card → F9 "Saved." → close → relaunch → Continue on the crest in normal view. Walking back into the trigger doesn't replay; `discovered.overlook` and the repair and ring facts persisted.
+  - repaired guild: warm room, table, Maren; talking to her writes `npc.lodger.met`
+  - New Game over a save: question → Esc → save byte-identical; confirm → cold room, and the old save is replaced only by the close autosave
+  - `godot.log`: no errors in any run
+  - Not verified with real input in the release exe: fights (covered in the pack by `test_combat_world` and the `test_quest` e2e), a physical gamepad, and the whole route in one sitting (that's the human playtest).
+- **Tester package:** `tools/package_playtest.ps1` → `export/playtest/WanderersGuild-playtest-<date>-<commit>[-dirty].zip` with the exe, `docs/playtest/README.txt` (launch, controls, New Game/Continue, saving, "go wherever you like", known limitations, how to send feedback + the log path) and `docs/playtest/FEEDBACK.txt` (the 12 questions). Everyone gets the same zip; the script prints its SHA-256.
+- Exported builds share `user://` with editor runs (`%APPDATA%\Godot\app_userdata\The Wanderer's Guild`). The developer save was backed up and restored around the smoke runs.
+
+### Performance baseline (M15)
+
+`--perf=600` (`PerfProbe`), vsync off, after 120 settle frames. Settings: 1920x1080 window, 3D view 640x360 (shrink 3), post shader on, Forward+. Hardware: AMD Ryzen AI 7 350 with integrated Radeon 860M (a laptop iGPU, a modest target). Exported debug build, two passes (the range is run-to-run noise on a laptop):
+
+| Pose | avg frame | worst | render CPU / GPU (3D view) | draw calls | objects | primitives |
+|---|---|---|---|---|---|---|
+| A guild interior (spawn) | 2.5–3.7 ms | 5.7–15.0 ms | 0.45–0.58 / 0.93–1.56 ms | 128 | 676 | 22.4k |
+| B Near Wood path (-8, -60) | 2.5–2.6 ms | 8.1–9.6 ms | 0.40–0.43 / 0.97–1.04 ms | 85 | 370 | 12.9k |
+| C combat (boars, player turn) | 2.6–4.1 ms | 9.1–13.3 ms | 0.47–0.59 / 1.07–1.80 ms | 136 | 872 | 16.6k |
+| D = B with 3x forest meshes (+2110) | 2.9–3.1 ms | 4.8–7.2 ms | 0.52–0.53 / 1.26–1.45 ms | 93 | 963 | 34.3k |
+| E overlook approach | 2.6 ms | 4.4–5.2 ms | 0.38–0.40 / 1.01–1.03 ms | 68 | 215 | 7.7k |
+
+The editor build measured the same poses within that range (A 2.4, B 2.6, C 2.8, D 2.8 ms).
+
+- **Speed:** ~250–400 fps on an iGPU. The 640x360 3D view costs about 1 ms of GPU time.
+- **Density:** tripling the forest meshes adds ~0.2–0.4 ms of GPU time and barely changes draw calls. Nothing here justifies optimisation work, and region size isn't performance-bound at this density.
+- **Spikes:** worst frames up to 15 ms are single hitches (likely shader compiles or combat overlay creation). Watch, don't act.
+- **Not measured:** a discrete-GPU or low-end machine, a release build (the probe is debug-only), a 1366x768 window, the load time of a region swap.
+
+### Found, not fixed (M15)
+- An intermittent engine segfault at process exit, seen once after an export and once after a test that had already passed. Output was complete both times: Godot's shutdown, not game code.
+- Under heavy parallel load (a download running), `test_reveal`'s "glide doesn't stop at the middle marker" failed once (it's frame-timing based). It passed 3/3 when rerun alone.
+- The window is 1920x1080. Behaviour on a smaller laptop screen is unverified.
