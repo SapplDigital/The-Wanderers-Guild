@@ -47,6 +47,16 @@ func _physics_process(delta: float) -> void:
 		move_state = MoveState.IDLE
 
 
+## The one "safe moment" rule: normal exploration, i.e. no fight, conversation or cinematic owns
+## the player (they all take `input_enabled` away; a cinematic also owns the camera). Saving,
+## world-event opportunities, starting a fight or a reveal and the debug keys all ask this, so
+## there is exactly one definition. The camera's return blend after a cinematic already counts as
+## exploring: control is back, only the view is still easing home.
+func is_exploring() -> bool:
+	var rig := camera_rig as CameraController
+	return input_enabled and not (rig and rig.is_cinematic)
+
+
 ## Slow recovery between fights. Only in normal exploration (fights, conversations and cinematics
 ## take player input away) and never at 0 HP. Health is already saved, so nothing else changes.
 func _recover(delta: float) -> void:

@@ -66,6 +66,7 @@ func _first_reveal(main: Node) -> void:
 	_check(not player.input_enabled, "player input is off during the reveal")
 	_check(not rig._orbiting, "the reveal clears a held orbit")
 	_check(not main.save_game(), "saving is refused during the reveal")
+	_check(not player.is_exploring(), "the one safe-moment rule says busy during the reveal")
 	_check(not GameState.is_set(FLAG), "the discovery isn't written while the reveal plays")
 	var release := orbit.duplicate() as InputEventAction
 	release.pressed = false
@@ -111,6 +112,8 @@ func _first_reveal(main: Node) -> void:
 	_check(absf(angle_difference(rig.rotation.y, yaw_goal)) < deg_to_rad(1.0), "the camera keeps the reveal's yaw")
 	_check(is_equal_approx(rig._zoom, reveal.return_zoom), "zoom returns to the LOOK end (%.1f)" % rig._zoom)
 	_check(GameState.get_flag(EventDirector.OPPORTUNITY) == opportunity, "the reveal created no event opportunity")
+	_check(player.is_exploring() and rig.state == CameraController.State.CINEMATIC,
+		"control is back while the camera still blends home: that already counts as exploring (M15.5)")
 
 	await _until(func() -> bool: return rig.state != CameraController.State.CINEMATIC)
 	await _physics(2)

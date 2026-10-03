@@ -6,13 +6,13 @@ extends RefCounted
 
 static func outcome(quest: QuestData, flags: Object) -> QuestOutcome:
 	for o in quest.outcomes:
-		if _all(o.conditions, flags):
+		if DialogueCondition.all_pass(o.conditions, flags):
 			return o
 	return null
 
 
 static func is_accepted(quest: QuestData, flags: Object) -> bool:
-	return _all(quest.accepted_when, flags)
+	return DialogueCondition.all_pass(quest.accepted_when, flags)
 
 
 ## Accepted and not yet resolved: what the HUD shows.
@@ -23,10 +23,6 @@ static func is_active(quest: QuestData, flags: Object) -> bool:
 ## The first objective whose facts aren't true yet; null when all are (or none exist).
 static func current_objective(quest: QuestData, flags: Object) -> QuestObjective:
 	for o in quest.objectives:
-		if not _all(o.done_when, flags):
+		if not DialogueCondition.all_pass(o.done_when, flags):
 			return o
 	return null
-
-
-static func _all(conditions: Array[DialogueCondition], flags: Object) -> bool:
-	return conditions.all(func(c: DialogueCondition) -> bool: return c.passes(flags))

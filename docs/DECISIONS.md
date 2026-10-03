@@ -231,3 +231,26 @@ The editor build measured the same poses within that range (A 2.4, B 2.6, C 2.8,
 - An intermittent engine segfault at process exit, seen once after an export and once after a test that had already passed. Output was complete both times: Godot's shutdown, not game code.
 - Under heavy parallel load (a download running), `test_reveal`'s "glide doesn't stop at the middle marker" failed once (it's frame-timing based). It passed 3/3 when rerun alone.
 - The window is 1920x1080. Behaviour on a smaller laptop screen is unverified.
+
+## M15.5 Architecture audit (2026-10-03)
+
+Audit + targeted refactor, no new features. Findings, classification and what was left alone:
+`docs/ARCHITECTURE_AUDIT.md`. New docs: `docs/ARCHITECTURE.md` (the architecture as it is),
+`docs/DEVELOPER_GUIDE.md` (recipes), `docs/MODDING.md` (status per content type; no mod support exists).
+
+- **One safe-moment rule: `Player.is_exploring()`** = player input on and no cinematic owns the camera. Saving, event opportunities, starting a fight, starting a reveal and the debug keys used four copies with two meanings: `state == CINEMATIC` is true through the 1.4 s blend back, `is_cinematic` is not. Chosen meaning: control is back = exploring. Only behaviour change of M15.5: during that blend, saving and event opportunities are now allowed. Pinned in `test_reveal`.
+- **Shared condition/consequence rules:** `DialogueCondition.all_pass(list, flags)` and `DialogueConsequence.apply(flags)` replace three copies of the "all pass" loop and two copies of "empty SET_FLAG value = true" (runner, director, tracker). M16's counting conditions and ADD consequence go there.
+- **`EncounterData.validate()` / `ActorData.validate()`:** an `enemy_offsets` list shorter than `enemies` used to crash the fight. `test_combat_world` validates every encounter and player actor that a `CombatArea` in the region uses.
+- **`GameState.replace(flags)`** for load and New Game. It emits no `flag_changed` on purpose: the world is rebuilt right after.
+- **The `--shot` harness is debug-only.** It ran in release builds when passed on the command line, and it can set flags. Verified: the release exe ignores it.
+- **Not changed (documented):**
+  - The dialogue EVENT channel has no listener, so Wenna's `rumour.old_wood_lights` leaves no trace. M21 decides; the guide says to use SET_FLAG.
+  - `main.gd` does five jobs. Extract the harness when it grows.
+  - The single world → M22.
+  - The HUD group API stays string-based.
+- **Verification:**
+  - All 11 suites pass in the editor and against the re-exported pack.
+  - Release exe with real input: New Game → hearth (quest accepted) → F9 → relaunch → Continue. Logs of the normal runs have 0 errors.
+- **Found, not fixed:**
+  - Godot sometimes segfaults while exiting after a completed test. Seen once in `test_dialogue` (twice in a row, then 0 of 6 reruns, on the M15 code as well). It's the engine's shutdown and the output is complete, but a CI runner would see exit 139.
+  - Headless exports re-serialise `project.godot` in long form (identical content). Restored to the committed form so the diff stays focused.

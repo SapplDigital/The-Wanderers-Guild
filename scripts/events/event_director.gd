@@ -34,7 +34,7 @@ static func evaluate(events: Array[EventData], flags: Object, region: StringName
 static func eligible(events: Array[EventData], flags: Object, region: StringName, opportunity: int) -> Array[EventData]:
 	var out: Array[EventData] = []
 	for e in events:
-		if e.region != region or not _all(e.conditions, flags):
+		if e.region != region or not DialogueCondition.all_pass(e.conditions, flags):
 			continue
 		var fired: Variant = flags.get_flag(_key(e, "fired"))
 		if e.repeat == EventData.Repeat.ONCE and fired is bool and fired:
@@ -55,7 +55,7 @@ static func choose(candidates: Array[EventData], seed: int, opportunity: int, re
 
 ## Weighted pick among the variants whose conditions pass; null if the event has none.
 static func choose_variant(event: EventData, flags: Object, seed: int, opportunity: int) -> EventVariant:
-	var options := event.variants.filter(func(v: EventVariant) -> bool: return _all(v.conditions, flags))
+	var options := event.variants.filter(func(v: EventVariant) -> bool: return DialogueCondition.all_pass(v.conditions, flags))
 	var i := _weighted(options.map(func(v: EventVariant) -> int: return v.weight), hash([seed, opportunity, String(event.id), "variant"]))
 	return options[i] if i >= 0 else null
 
@@ -66,8 +66,7 @@ static func fire(event: EventData, variant: EventVariant, flags: Object, opportu
 		effects.append_array(variant.start)
 		flags.set_flag(_key(event, "variant"), String(variant.id))
 	for effect: DialogueConsequence in effects:
-		# Same rule as DialogueRunner's SET_FLAG: empty value means true.
-		flags.set_flag(effect.key, true if effect.value == "" else effect.value)
+		effect.apply(flags) # validate() guarantees SET_FLAG only
 	flags.set_flag(_key(event, "fired"), true)
 	flags.set_flag(_key(event, "last_opportunity"), opportunity)
 	flags.set_flag(LAST_FIRED, opportunity)
@@ -87,10 +86,6 @@ static func _weighted(weights: Array, rng_seed: int) -> int:
 		if roll <= 0:
 			return i
 	return weights.size() - 1
-
-
-static func _all(conditions: Array[DialogueCondition], flags: Object) -> bool:
-	return conditions.all(func(c: DialogueCondition) -> bool: return c.passes(flags))
 
 
 static func _key(event: EventData, fact: String) -> String:

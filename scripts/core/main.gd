@@ -31,10 +31,16 @@ func _ready() -> void:
 	# save unless asked with --load; --fresh skips the title straight into a new game.
 	if args.has("load") and OS.is_debug_build():
 		load_game()
-	elif (get_tree().current_scene == self and not (args.has("fresh") or args.has("shot") or args.has("world"))) 			or (args.has("title") and OS.is_debug_build()): # --title: shot runs of the start screen
+	elif _normal_launch(args) or (args.has("title") and OS.is_debug_build()): # --title: shot runs of the start screen
 		show_title()
 	_autosave = not args.has("shot")
-	_handle_cli_screenshot(args)
+	if OS.is_debug_build(): # developer harness: can set flags and quit; never in a release build
+		_handle_cli_screenshot(args)
+
+
+## A player's launch: main is the running scene (not a test) and no developer flag chose a start.
+func _normal_launch(args: Dictionary) -> bool:
+	return get_tree().current_scene == self and not (args.has("fresh") or args.has("shot") or args.has("world"))
 
 
 ## `--key=value` user args (after `--` on the command line).
@@ -98,7 +104,7 @@ func _on_title_chosen(action: StringName) -> void:
 			show_title() # the save went bad since the title opened: say so, stay here
 			return
 	else:
-		GameState.flags = {}
+		GameState.replace({})
 		_swap_world(MAIN_WORLD)
 	_title.close()
 	_hud.visible = true
@@ -111,7 +117,7 @@ func save_game() -> bool:
 	if _title.is_open():
 		return false
 	var player: Player = _world.get_node("Player")
-	if _world.scene_file_path != MAIN_WORLD or not player.input_enabled or _rig().state == CameraController.State.CINEMATIC:
+	if _world.scene_file_path != MAIN_WORLD or not player.is_exploring():
 		return false
 	return SaveGame.write(save_path, GameState.flags, player.global_position, player.health) == OK
 
@@ -125,7 +131,7 @@ func load_game(report_missing := true) -> bool:
 		if data.error != SaveGame.NO_SAVE or report_missing:
 			_hud.show_message("No save to load." if data.error == SaveGame.NO_SAVE else data.error)
 		return false
-	GameState.flags = data.flags
+	GameState.replace(data.flags)
 	_swap_world(MAIN_WORLD, data.position, data.health)
 	return true
 
@@ -188,8 +194,7 @@ func _rig() -> CameraController:
 ## Normal exploration: not in a fight, a conversation or a cinematic (they all take player input).
 ## Debug keys that rebuild the world, start a fight or play a cinematic only act here.
 func _exploring() -> bool:
-	var player: Player = _world.get_node("Player")
-	return player.input_enabled and not _rig().is_cinematic
+	return (_world.get_node("Player") as Player).is_exploring()
 
 
 ## Walks the player into the nearest CombatArea's fight (debug shortcut).

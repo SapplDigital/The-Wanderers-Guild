@@ -26,9 +26,10 @@ func on_region_entered(region: StringName) -> void:
 	_announce(EventDirector.evaluate(_events, GameState, region))
 
 
-## Nothing may start while the player is busy: combat and dialogue disable input.
+## Nothing may start while the player is busy (fight, conversation, cinematic): the same rule as
+## saving, `Player.is_exploring`.
 func is_safe() -> bool:
-	return player.input_enabled and camera_rig.state != CameraController.State.CINEMATIC
+	return player.is_exploring()
 
 
 ## F8 (debug builds): evaluate the current region now, ignoring the gap but not the conditions.

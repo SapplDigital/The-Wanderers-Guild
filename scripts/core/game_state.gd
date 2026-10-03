@@ -22,6 +22,13 @@ func set_flag(key: String, value: Variant = true) -> void:
 	flag_changed.emit(key, value)
 
 
+## Swaps in a whole new set of facts (a load, or a new game with `{}`). Deliberately emits no
+## `flag_changed`: the caller rebuilds the world right after, and every listener reads the flags
+## again on `_ready`. Emitting per key here would announce quest updates for a loaded save.
+func replace(new_flags: Dictionary) -> void:
+	flags = new_flags
+
+
 func get_flag(key: String, default: Variant = null) -> Variant:
 	return flags.get(key, default)
 

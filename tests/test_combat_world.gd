@@ -18,6 +18,13 @@ func _ready() -> void:
 	var by_id := {}
 	for a in world.find_children("*", "CombatArea"):
 		by_id[a.encounter.id] = a
+		# Every encounter and actor the region really uses validates (and so does the player's).
+		_check(a.encounter.validate().is_empty(), "encounter %s validates %s" % [a.encounter.id, a.encounter.validate()])
+		_check(a.player_data != null and a.player_data.validate().is_empty(), "%s: the player's ActorData validates" % a.encounter.id)
+	var bad := EncounterData.new()
+	bad.id = &"bad"
+	bad.enemies = [null]
+	_check(bad.validate().size() == 2, "encounter validator catches a missing offset and an empty enemy slot: %s" % bad.validate())
 	_check(by_id.has(&"clearing_boars") and by_id.has(&"forest_edge_midges") and by_id.has(&"broken_gate_guardian"),
 		"slice region authors the boar, midge and gate-guardian encounters")
 	if by_id.size() != 3:

@@ -59,16 +59,15 @@ func leave() -> void:
 
 
 func _visible(choice: DialogueChoice) -> bool:
-	return choice.conditions.all(func(c: DialogueCondition) -> bool: return c.passes(flags))
+	return DialogueCondition.all_pass(choice.conditions, flags)
 
 
 func _take(choice: DialogueChoice) -> void:
 	for effect in choice.consequences:
-		match effect.kind:
-			DialogueConsequence.Kind.SET_FLAG:
-				flags.set_flag(effect.key, true if effect.value == "" else effect.value)
-			DialogueConsequence.Kind.EVENT:
-				event_fired.emit(StringName(effect.key))
+		if effect.kind == DialogueConsequence.Kind.EVENT:
+			event_fired.emit(StringName(effect.key))
+		else:
+			effect.apply(flags)
 	_go(choice.next)
 
 

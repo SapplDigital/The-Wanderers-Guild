@@ -2,6 +2,7 @@
 
 Cozy dark-fantasy exploration RPG with turn-based tactical combat, Godot **4.7.2** (mono build installed, but the project uses **GDScript**).
 Design authority: `docs/GDD.md` (text copy of `The_Wanderers_Guild_GDD.pdf`). Decisions: `docs/DECISIONS.md`.
+Code orientation: `docs/ARCHITECTURE.md` (how it works), `docs/DEVELOPER_GUIDE.md` (how to add things), `docs/MODDING.md`, `docs/ARCHITECTURE_AUDIT.md` (M15.5 findings).
 Milestone status: `task_plan.md`, session log: `progress.md`.
 
 ## Run / verify
@@ -26,6 +27,8 @@ Milestone status: `task_plan.md`, session log: `progress.md`.
 - Hand-written `.tscn`: Node-typed exports assigned by path NEED `node_paths=PackedStringArray("prop")` in the node header, otherwise they silently stay null. Don't set a Node-typed export as an override on a *child* of an instanced scene from the outer scene (`[node name="X" parent="Instance/..."]`): the exported build dropped exactly that (M15, `InteriorZone.camera_rig`) while the editor kept it. Resolve such links inside the instanced scene or through a group (`CameraController.GROUP`).
 - Materials: 64px NoiseTexture2D + constant-interpolation Gradient (hard palette steps), world triplanar, `uv1_scale 0.5` (= 32 texels/m). Keep texel density consistent.
 - Debug-only features check `OS.is_debug_build()`.
+- Safe moment = `Player.is_exploring()` (no fight, conversation or cinematic owns the player). Anything that may only happen in normal exploration (saving, events, fights, reveals, region exits later) asks it; don't write another variant.
+- Conditions/consequences: evaluate lists with `DialogueCondition.all_pass`, apply effects with `DialogueConsequence.apply` (shared by dialogue, quests and events).
 - Camera: design landmarks against the LOOK end of the rail (pitch -8°..+10°); reveals use `CinematicReveal` (see DECISIONS): child `Marker3D`s are the glide path (one eased curve), `focus` + `focus_offset` is the aim (frame the landmark AND the next reachable goal; check the return frame at FOV 40 / pitch +10°), `location_id`/`title` make it that place's one-time discovery (`discovered.<id>`, written when control returns). Don't also put a `DiscoveryZone` on the same place.
 - Main world: `scenes/world/slice_region.tscn` (village south at origin, forest north along -Z). A new game starts in the guild's common room at the hearth. The region is closed by `Edge` (layer-3 wall loop + edge treeline + low rises outside it); new content must stay inside the loop (`test_exploration_loop` checks the anchors). Named anchors for later milestones: `Village/GuildDoor`, `Village/Well`, `Village/NoticeBoard`, `Forest/CombatClearing/CombatArea`, `Forest/AbandonedCamp`, `Forest/HiddenHollow`, `Forest/ResourceNodes`, `Landmarks/*`.
 - Test scenes: `scenes/world/visual_spike.tscn` (M3), `scenes/world/camera_test.tscn` (camera states); run with `--world=`.
